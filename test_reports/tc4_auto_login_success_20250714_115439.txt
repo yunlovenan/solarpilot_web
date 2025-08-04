@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc4_auto_login_success
+Timestamp: 20250714_115439
+Note: Install PIL (Pillow) for actual image generation

@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc1_app_launched
+Timestamp: 20250714_111714
+Note: Install PIL (Pillow) for actual image generation

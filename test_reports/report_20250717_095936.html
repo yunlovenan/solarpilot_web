@@ -1,0 +1,627 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录测试套件 - 测试报告</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            background-color: #FF9800;
+            margin: 10px 0;
+        }
+        .overview {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .overview-item {
+            flex: 1;
+            min-width: 200px;
+            margin: 5px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .test-cases {
+            margin-top: 30px;
+        }
+        .test-case {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .test-case-title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .test-case-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: white;
+        }
+        .status-pass {
+            background-color: #4CAF50;
+        }
+        .status-fail {
+            background-color: #F44336;
+        }
+        .steps {
+            margin-top: 15px;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-left: 3px solid #ddd;
+        }
+        .step.pass {
+            border-left-color: #4CAF50;
+        }
+        .step.fail {
+            border-left-color: #F44336;
+        }
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .step-title {
+            font-weight: bold;
+        }
+        .step-status {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+        .step-details {
+            margin-bottom: 10px;
+        }
+        .step-details p {
+            margin: 3px 0;
+        }
+        .step-screenshot {
+            margin-top: 10px;
+        }
+        .step-screenshot img {
+            max-width: 100%;
+            max-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .time {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>登录测试套件</h1>
+            <div class="status-badge">PARTIAL</div>
+            <p>包含多个登录场景测试，包括失败和成功的情况</p>
+        </div>
+        
+        <div class="overview">
+            <div class="overview-item">
+                <h3>开始时间</h3>
+                <p>2025-07-17 09:59:36</p>
+            </div>
+            <div class="overview-item">
+                <h3>结束时间</h3>
+                <p>2025-07-17 10:00:40</p>
+            </div>
+            <div class="overview-item">
+                <h3>测试时长</h3>
+                <p>0:01:04.501359</p>
+            </div>
+            <div class="overview-item">
+                <h3>测试用例数</h3>
+                <p>4</p>
+            </div>
+        </div>
+        
+        <div class="test-cases">
+            <h2>测试用例</h2>
+        
+            <div class="test-case">
+                <div class="test-case-header">
+                    <div class="test-case-title">用例 TC-1: 空用户名登录</div>
+                    <div class="test-case-status status-pass">PASS</div>
+                </div>
+                <p>使用空用户名和正确密码尝试登录</p>
+                <div class="time">
+                    <span>开始: 2025-07-17 09:59:36</span> | 
+                    <span>结束: 2025-07-17 09:59:53</span> | 
+                    <span>时长: 0:00:17.247290</span>
+                </div>
+                
+                <details>
+                    <summary>查看步骤 (5 个)</summary>
+                    <div class="steps">
+            
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 1: 启动应用</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 打开应用 com.eiot6.solartest</p>
+                        <p><strong>预期结果:</strong> 应用成功启动，显示登录界面</p>
+                        <p><strong>实际结果:</strong> 应用已启动，显示登录界面</p>
+                        <p class="time">2025-07-17 09:59:36</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc1_app_launched_20250717_095939.txt" alt="Step 1 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 2: 清空用户名字段</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击用户名字段并清空</p>
+                        <p><strong>预期结果:</strong> 用户名字段为空</p>
+                        <p><strong>实际结果:</strong> 用户名字段已清空</p>
+                        <p class="time">2025-07-17 09:59:39</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc1_empty_username_20250717_095943.txt" alt="Step 2 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 3: 输入密码</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击密码字段并输入有效密码: mayun1314@</p>
+                        <p><strong>预期结果:</strong> 密码字段已输入有效密码</p>
+                        <p><strong>实际结果:</strong> 密码已输入: mayun1314@</p>
+                        <p class="time">2025-07-17 09:59:43</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc1_password_input_20250717_095947.txt" alt="Step 3 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 4: 勾选协议复选框</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击协议复选框进行勾选</p>
+                        <p><strong>预期结果:</strong> 协议复选框已勾选</p>
+                        <p><strong>实际结果:</strong> 协议复选框已勾选</p>
+                        <p class="time">2025-07-17 09:59:47</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc1_checkbox_checked_20250717_095948.txt" alt="Step 4 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 5: 点击登录按钮</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击登录按钮尝试登录</p>
+                        <p><strong>预期结果:</strong> 显示用户名不能为空的错误提示</p>
+                        <p><strong>实际结果:</strong> 收到用户名不能为空的错误提示</p>
+                        <p class="time">2025-07-17 09:59:48</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc1_login_attempted_20250717_095951.txt" alt="Step 5 screenshot">
+                    </div>
+                    
+                </div>
+                
+                    </div>
+                </details>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <div class="test-case-title">用例 TC-2: 错误密码登录</div>
+                    <div class="test-case-status status-pass">PASS</div>
+                </div>
+                <p>使用正确用户名和错误密码尝试登录</p>
+                <div class="time">
+                    <span>开始: 2025-07-17 09:59:53</span> | 
+                    <span>结束: 2025-07-17 10:00:11</span> | 
+                    <span>时长: 0:00:17.934570</span>
+                </div>
+                
+                <details>
+                    <summary>查看步骤 (5 个)</summary>
+                    <div class="steps">
+            
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 1: 确保应用在登录界面</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 如果需要，重新启动应用到登录界面</p>
+                        <p><strong>预期结果:</strong> 应用显示登录界面</p>
+                        <p><strong>实际结果:</strong> 应用处于登录界面</p>
+                        <p class="time">2025-07-17 09:59:53</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc2_login_screen_20250717_095955.txt" alt="Step 1 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 2: 输入正确用户名</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 清空用户名字段并输入: mayunfws</p>
+                        <p><strong>预期结果:</strong> 用户名字段已输入正确用户名</p>
+                        <p><strong>实际结果:</strong> 用户名已输入: mayunfws</p>
+                        <p class="time">2025-07-17 09:59:55</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc2_username_input_20250717_100000.txt" alt="Step 2 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 3: 输入错误密码</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 清空密码字段并输入错误密码: wrongpassword</p>
+                        <p><strong>预期结果:</strong> 密码字段已输入错误密码</p>
+                        <p><strong>实际结果:</strong> 错误密码已输入: wrongpassword</p>
+                        <p class="time">2025-07-17 10:00:00</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc2_wrong_password_20250717_100004.txt" alt="Step 3 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 4: 勾选协议复选框</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击协议复选框进行勾选</p>
+                        <p><strong>预期结果:</strong> 协议复选框已勾选</p>
+                        <p><strong>实际结果:</strong> 协议复选框已勾选</p>
+                        <p class="time">2025-07-17 10:00:04</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc2_checkbox_checked_20250717_100005.txt" alt="Step 4 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 5: 点击登录按钮</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击登录按钮尝试登录</p>
+                        <p><strong>预期结果:</strong> 显示密码错误或账号密码不匹配的错误提示</p>
+                        <p><strong>实际结果:</strong> 收到密码错误的提示</p>
+                        <p class="time">2025-07-17 10:00:05</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc2_login_attempted_20250717_100009.txt" alt="Step 5 screenshot">
+                    </div>
+                    
+                </div>
+                
+                    </div>
+                </details>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <div class="test-case-title">用例 TC-3: 有效凭据登录</div>
+                    <div class="test-case-status status-fail">FAIL</div>
+                </div>
+                <p>使用正确用户名和密码登录</p>
+                <div class="time">
+                    <span>开始: 2025-07-17 10:00:11</span> | 
+                    <span>结束: 2025-07-17 10:00:39</span> | 
+                    <span>时长: 0:00:28.250037</span>
+                </div>
+                
+                <details>
+                    <summary>查看步骤 (8 个)</summary>
+                    <div class="steps">
+            
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 1: 确保应用在登录界面</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 如果需要，重新启动应用到登录界面</p>
+                        <p><strong>预期结果:</strong> 应用显示登录界面</p>
+                        <p><strong>实际结果:</strong> 应用处于登录界面</p>
+                        <p class="time">2025-07-17 10:00:11</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_login_screen_20250717_100013.txt" alt="Step 1 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 2: 输入正确用户名</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 清空用户名字段并输入: mayunfws</p>
+                        <p><strong>预期结果:</strong> 用户名字段已输入正确用户名</p>
+                        <p><strong>实际结果:</strong> 用户名已输入: mayunfws</p>
+                        <p class="time">2025-07-17 10:00:13</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_username_input_20250717_100018.txt" alt="Step 2 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 3: 输入正确密码</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 清空密码字段并输入正确密码: mayun1314@</p>
+                        <p><strong>预期结果:</strong> 密码字段已输入正确密码</p>
+                        <p><strong>实际结果:</strong> 正确密码已输入: mayun1314@</p>
+                        <p class="time">2025-07-17 10:00:18</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_correct_password_20250717_100022.txt" alt="Step 3 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 4: 勾选协议复选框</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击协议复选框进行勾选</p>
+                        <p><strong>预期结果:</strong> 协议复选框已勾选</p>
+                        <p><strong>实际结果:</strong> 协议复选框已勾选</p>
+                        <p class="time">2025-07-17 10:00:22</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_checkbox_checked_20250717_100023.txt" alt="Step 4 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 5: 点击登录按钮</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 点击登录按钮尝试登录</p>
+                        <p><strong>预期结果:</strong> 开始登录流程</p>
+                        <p><strong>实际结果:</strong> 已点击登录按钮</p>
+                        <p class="time">2025-07-17 10:00:23</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_login_clicked_20250717_100029.txt" alt="Step 5 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 6: 处理隐私政策弹窗</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 检查是否出现隐私政策弹窗，如有则同意</p>
+                        <p><strong>预期结果:</strong> 成功处理隐私政策弹窗（如有）</p>
+                        <p><strong>实际结果:</strong> 检测到隐私政策弹窗并已点击同意</p>
+                        <p class="time">2025-07-17 10:00:29</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_privacy_agreed_20250717_100032.txt" alt="Step 6 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step pass">
+                    <div class="step-header">
+                        <div class="step-title">步骤 7: 选择身份</div>
+                        <div class="step-status status-pass">PASS</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 选择'我是服务商'身份</p>
+                        <p><strong>预期结果:</strong> 成功选择'我是服务商'身份</p>
+                        <p><strong>实际结果:</strong> 无需选择身份或已自动选择</p>
+                        <p class="time">2025-07-17 10:00:35</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_no_role_selection_20250717_100037.txt" alt="Step 7 screenshot">
+                    </div>
+                    
+                </div>
+                
+                <div class="step fail">
+                    <div class="step-header">
+                        <div class="step-title">步骤 8: 验证登录成功</div>
+                        <div class="step-status status-fail">FAIL</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 检查是否成功登录并进入主页</p>
+                        <p><strong>预期结果:</strong> 成功登录到应用主页</p>
+                        <p><strong>实际结果:</strong> 未能验证登录成功</p>
+                        <p class="time">2025-07-17 10:00:37</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc3_login_verification_20250717_100037.txt" alt="Step 8 screenshot">
+                    </div>
+                    
+                </div>
+                
+                    </div>
+                </details>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <div class="test-case-title">用例 TC-4: 使用Cookies自动登录</div>
+                    <div class="test-case-status status-fail">FAIL</div>
+                </div>
+                <p>尝试使用已保存的Cookies进行自动登录</p>
+                <div class="time">
+                    <span>开始: 2025-07-17 10:00:39</span> | 
+                    <span>结束: 2025-07-17 10:00:40</span> | 
+                    <span>时长: 0:00:01.069152</span>
+                </div>
+                
+                <details>
+                    <summary>查看步骤 (1 个)</summary>
+                    <div class="steps">
+            
+                <div class="step fail">
+                    <div class="step-header">
+                        <div class="step-title">步骤 1: 检查已保存的Cookies</div>
+                        <div class="step-status status-fail">FAIL</div>
+                    </div>
+                    <div class="step-details">
+                        <p><strong>描述:</strong> 检查是否有已保存的有效Cookies</p>
+                        <p><strong>预期结果:</strong> 找到有效的Cookies并尝试使用</p>
+                        <p><strong>实际结果:</strong> Cookies无效或已过期</p>
+                        <p class="time">2025-07-17 10:00:39</p>
+                    </div>
+                    
+                    <div class="step-screenshot">
+                        <h4>截图:</h4>
+                        <img src="../tc4_before_cookie_login_20250717_100040.txt" alt="Step 1 screenshot">
+                    </div>
+                    
+                </div>
+                
+                    </div>
+                </details>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
+        

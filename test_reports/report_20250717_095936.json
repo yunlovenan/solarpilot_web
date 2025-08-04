@@ -1,0 +1,225 @@
+{
+  "suite_name": "登录测试套件",
+  "description": "包含多个登录场景测试，包括失败和成功的情况",
+  "start_time": "2025-07-17 09:59:36",
+  "end_time": "2025-07-17 10:00:40",
+  "duration": "0:01:04.501359",
+  "status": "PARTIAL",
+  "test_cases": [
+    {
+      "id": "TC-1",
+      "name": "空用户名登录",
+      "description": "使用空用户名和正确密码尝试登录",
+      "start_time": "2025-07-17 09:59:36",
+      "end_time": "2025-07-17 09:59:53",
+      "duration": "0:00:17.247290",
+      "status": "PASS",
+      "steps": [
+        {
+          "name": "启动应用",
+          "description": "打开应用 com.eiot6.solartest",
+          "expected_result": "应用成功启动，显示登录界面",
+          "actual_result": "应用已启动，显示登录界面",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:36",
+          "screenshot": "test_reports/tc1_app_launched_20250717_095939.txt"
+        },
+        {
+          "name": "清空用户名字段",
+          "description": "点击用户名字段并清空",
+          "expected_result": "用户名字段为空",
+          "actual_result": "用户名字段已清空",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:39",
+          "screenshot": "test_reports/tc1_empty_username_20250717_095943.txt"
+        },
+        {
+          "name": "输入密码",
+          "description": "点击密码字段并输入有效密码: mayun1314@",
+          "expected_result": "密码字段已输入有效密码",
+          "actual_result": "密码已输入: mayun1314@",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:43",
+          "screenshot": "test_reports/tc1_password_input_20250717_095947.txt"
+        },
+        {
+          "name": "勾选协议复选框",
+          "description": "点击协议复选框进行勾选",
+          "expected_result": "协议复选框已勾选",
+          "actual_result": "协议复选框已勾选",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:47",
+          "screenshot": "test_reports/tc1_checkbox_checked_20250717_095948.txt"
+        },
+        {
+          "name": "点击登录按钮",
+          "description": "点击登录按钮尝试登录",
+          "expected_result": "显示用户名不能为空的错误提示",
+          "actual_result": "收到用户名不能为空的错误提示",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:48",
+          "screenshot": "test_reports/tc1_login_attempted_20250717_095951.txt"
+        }
+      ]
+    },
+    {
+      "id": "TC-2",
+      "name": "错误密码登录",
+      "description": "使用正确用户名和错误密码尝试登录",
+      "start_time": "2025-07-17 09:59:53",
+      "end_time": "2025-07-17 10:00:11",
+      "duration": "0:00:17.934570",
+      "status": "PASS",
+      "steps": [
+        {
+          "name": "确保应用在登录界面",
+          "description": "如果需要，重新启动应用到登录界面",
+          "expected_result": "应用显示登录界面",
+          "actual_result": "应用处于登录界面",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:53",
+          "screenshot": "test_reports/tc2_login_screen_20250717_095955.txt"
+        },
+        {
+          "name": "输入正确用户名",
+          "description": "清空用户名字段并输入: mayunfws",
+          "expected_result": "用户名字段已输入正确用户名",
+          "actual_result": "用户名已输入: mayunfws",
+          "status": "PASS",
+          "timestamp": "2025-07-17 09:59:55",
+          "screenshot": "test_reports/tc2_username_input_20250717_100000.txt"
+        },
+        {
+          "name": "输入错误密码",
+          "description": "清空密码字段并输入错误密码: wrongpassword",
+          "expected_result": "密码字段已输入错误密码",
+          "actual_result": "错误密码已输入: wrongpassword",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:00",
+          "screenshot": "test_reports/tc2_wrong_password_20250717_100004.txt"
+        },
+        {
+          "name": "勾选协议复选框",
+          "description": "点击协议复选框进行勾选",
+          "expected_result": "协议复选框已勾选",
+          "actual_result": "协议复选框已勾选",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:04",
+          "screenshot": "test_reports/tc2_checkbox_checked_20250717_100005.txt"
+        },
+        {
+          "name": "点击登录按钮",
+          "description": "点击登录按钮尝试登录",
+          "expected_result": "显示密码错误或账号密码不匹配的错误提示",
+          "actual_result": "收到密码错误的提示",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:05",
+          "screenshot": "test_reports/tc2_login_attempted_20250717_100009.txt"
+        }
+      ]
+    },
+    {
+      "id": "TC-3",
+      "name": "有效凭据登录",
+      "description": "使用正确用户名和密码登录",
+      "start_time": "2025-07-17 10:00:11",
+      "end_time": "2025-07-17 10:00:39",
+      "duration": "0:00:28.250037",
+      "status": "FAIL",
+      "steps": [
+        {
+          "name": "确保应用在登录界面",
+          "description": "如果需要，重新启动应用到登录界面",
+          "expected_result": "应用显示登录界面",
+          "actual_result": "应用处于登录界面",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:11",
+          "screenshot": "test_reports/tc3_login_screen_20250717_100013.txt"
+        },
+        {
+          "name": "输入正确用户名",
+          "description": "清空用户名字段并输入: mayunfws",
+          "expected_result": "用户名字段已输入正确用户名",
+          "actual_result": "用户名已输入: mayunfws",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:13",
+          "screenshot": "test_reports/tc3_username_input_20250717_100018.txt"
+        },
+        {
+          "name": "输入正确密码",
+          "description": "清空密码字段并输入正确密码: mayun1314@",
+          "expected_result": "密码字段已输入正确密码",
+          "actual_result": "正确密码已输入: mayun1314@",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:18",
+          "screenshot": "test_reports/tc3_correct_password_20250717_100022.txt"
+        },
+        {
+          "name": "勾选协议复选框",
+          "description": "点击协议复选框进行勾选",
+          "expected_result": "协议复选框已勾选",
+          "actual_result": "协议复选框已勾选",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:22",
+          "screenshot": "test_reports/tc3_checkbox_checked_20250717_100023.txt"
+        },
+        {
+          "name": "点击登录按钮",
+          "description": "点击登录按钮尝试登录",
+          "expected_result": "开始登录流程",
+          "actual_result": "已点击登录按钮",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:23",
+          "screenshot": "test_reports/tc3_login_clicked_20250717_100029.txt"
+        },
+        {
+          "name": "处理隐私政策弹窗",
+          "description": "检查是否出现隐私政策弹窗，如有则同意",
+          "expected_result": "成功处理隐私政策弹窗（如有）",
+          "actual_result": "检测到隐私政策弹窗并已点击同意",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:29",
+          "screenshot": "test_reports/tc3_privacy_agreed_20250717_100032.txt"
+        },
+        {
+          "name": "选择身份",
+          "description": "选择'我是服务商'身份",
+          "expected_result": "成功选择'我是服务商'身份",
+          "actual_result": "无需选择身份或已自动选择",
+          "status": "PASS",
+          "timestamp": "2025-07-17 10:00:35",
+          "screenshot": "test_reports/tc3_no_role_selection_20250717_100037.txt"
+        },
+        {
+          "name": "验证登录成功",
+          "description": "检查是否成功登录并进入主页",
+          "expected_result": "成功登录到应用主页",
+          "actual_result": "未能验证登录成功",
+          "status": "FAIL",
+          "timestamp": "2025-07-17 10:00:37",
+          "screenshot": "test_reports/tc3_login_verification_20250717_100037.txt"
+        }
+      ]
+    },
+    {
+      "id": "TC-4",
+      "name": "使用Cookies自动登录",
+      "description": "尝试使用已保存的Cookies进行自动登录",
+      "start_time": "2025-07-17 10:00:39",
+      "end_time": "2025-07-17 10:00:40",
+      "duration": "0:00:01.069152",
+      "status": "FAIL",
+      "steps": [
+        {
+          "name": "检查已保存的Cookies",
+          "description": "检查是否有已保存的有效Cookies",
+          "expected_result": "找到有效的Cookies并尝试使用",
+          "actual_result": "Cookies无效或已过期",
+          "status": "FAIL",
+          "timestamp": "2025-07-17 10:00:39",
+          "screenshot": "test_reports/tc4_before_cookie_login_20250717_100040.txt"
+        }
+      ]
+    }
+  ]
+}

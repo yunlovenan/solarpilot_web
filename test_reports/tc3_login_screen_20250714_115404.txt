@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc3_login_screen
+Timestamp: 20250714_115404
+Note: Install PIL (Pillow) for actual image generation

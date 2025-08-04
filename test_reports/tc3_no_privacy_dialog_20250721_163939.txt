@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc3_no_privacy_dialog
+Timestamp: 20250721_163939
+Note: Install PIL (Pillow) for actual image generation

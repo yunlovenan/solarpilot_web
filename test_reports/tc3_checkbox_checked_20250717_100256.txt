@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc3_checkbox_checked
+Timestamp: 20250717_100256
+Note: Install PIL (Pillow) for actual image generation

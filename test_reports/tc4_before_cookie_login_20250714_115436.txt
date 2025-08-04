@@ -1,0 +1,3 @@
+Screenshot placeholder for: tc4_before_cookie_login
+Timestamp: 20250714_115436
+Note: Install PIL (Pillow) for actual image generation
