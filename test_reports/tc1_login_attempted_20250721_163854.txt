@@ -1,3 +1,0 @@
-Screenshot placeholder for: tc1_login_attempted
-Timestamp: 20250721_163854
-Note: Install PIL (Pillow) for actual image generation

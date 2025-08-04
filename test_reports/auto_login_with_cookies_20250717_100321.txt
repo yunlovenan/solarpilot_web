@@ -1,3 +1,0 @@
-Screenshot placeholder for: auto_login_with_cookies
-Timestamp: 20250717_100321
-Note: Install PIL (Pillow) for actual image generation

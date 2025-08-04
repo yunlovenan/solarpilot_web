@@ -1,3 +1,0 @@
-Screenshot placeholder for: tc2_login_screen
-Timestamp: 20250717_095955
-Note: Install PIL (Pillow) for actual image generation
