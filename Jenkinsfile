@@ -25,8 +25,13 @@ pipeline {
                         
                         # 安装Python3和pip（如果需要）
                         if ! command -v python3 &> /dev/null; then
+                            echo "安装Python3..."
                             sudo apt-get install -y python3 python3-pip
                         fi
+                        
+                        # 验证Python3安装
+                        python3 --version
+                        python3 -m pip --version
                         
                         # 安装Chrome浏览器
                         if ! command -v google-chrome &> /dev/null; then
@@ -60,11 +65,37 @@ pipeline {
                     
                     // 安装Python依赖
                     sh '''
+                        echo "📦 安装Python依赖..."
+                        
+                        # 升级pip
                         python3 -m pip install --upgrade pip
+                        echo "✅ pip升级完成"
+                        
+                        # 显示当前pip版本
+                        python3 -m pip --version
+                        
+                        # 安装requirements.txt中的依赖
+                        echo "安装项目依赖..."
                         python3 -m pip install -r requirements.txt
+                        echo "✅ 项目依赖安装完成"
+                        
+                        # 单独安装pytest（确保安装成功）
+                        echo "安装pytest..."
+                        python3 -m pip install pytest==8.4.1
+                        echo "✅ pytest安装完成"
                         
                         # 验证pytest安装
+                        echo "验证pytest安装..."
                         python3 -m pytest --version
+                        echo "✅ pytest验证成功"
+                        
+                        # 验证其他关键依赖
+                        echo "验证其他依赖..."
+                        python3 -c "import selenium; print(f'Selenium版本: {selenium.__version__}')"
+                        python3 -c "import openpyxl; print('OpenPyXL安装成功')"
+                        python3 -c "import pymysql; print('PyMySQL安装成功')"
+                        python3 -c "import allure; print('Allure-pytest安装成功')"
+                        echo "✅ 所有依赖验证完成"
                     '''
                 }
             }
@@ -80,8 +111,16 @@ pipeline {
                     
                     // 运行测试
                     sh '''
+                        echo "开始运行测试..."
+                        
+                        # 显示pytest版本和位置
+                        which python3
+                        python3 -m pytest --version
+                        
                         # 使用python3 -m pytest确保命令可用
-                        python3 -m pytest testcase/ -v --alluredir=allure_report --junitxml=junit.xml
+                        python3 -m pytest testcase/ -v --alluredir=allure_report --junitxml=junit.xml --tb=short
+                        
+                        echo "测试运行完成"
                     '''
                 }
             }
@@ -94,9 +133,11 @@ pipeline {
                     // 生成Allure报告
                     sh '''
                         if command -v allure &> /dev/null; then
+                            echo "生成Allure报告..."
                             allure generate allure_report --clean
+                            echo "✅ Allure报告生成完成"
                         else
-                            echo "Allure未安装，跳过报告生成"
+                            echo "⚠️ Allure未安装，跳过报告生成"
                         fi
                     '''
                 }
