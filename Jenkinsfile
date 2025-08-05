@@ -15,8 +15,8 @@ pipeline {
                 // 确保使用最新代码
                 sh '''
                     git fetch origin
-                    git checkout master
-                    git pull origin master
+                    git checkout main
+                    git pull origin main
                     echo "当前代码版本: $(git rev-parse HEAD)"
                 '''
             }
