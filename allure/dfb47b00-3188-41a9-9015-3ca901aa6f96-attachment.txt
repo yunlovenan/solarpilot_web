@@ -1,0 +1,20 @@
+[32mINFO    [0m test:test_1_login.py:31 开始执行登录的用例
+[32mINFO    [0m test:base_page.py:185 文本内容输入--('css selector', 'input[type="text"]')--成功
+[32mINFO    [0m test:base_page.py:185 文本内容输入--('css selector', 'input[type="password"]')--成功
+[32mINFO    [0m test:base_page.py:163 元素--('css selector', 'input[type="checkbox"]')--点击成功
+[32mINFO    [0m test:base_page.py:163 元素--('xpath', "//span[text()='登 录']")--点击成功
+[32mINFO    [0m test:base_page.py:163 元素--('xpath', "//*[contains(text(), '我是服务商')]")--点击成功
+[1m[31mERROR   [0m test:base_page.py:37 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--等待可见超时
+[1m[31mERROR   [0m test:base_page.py:38 Message: 
+Traceback (most recent call last):
+  File "/Users/mayun/project/solarpilot/solar_web/common/base_page.py", line 32, in wait_element_visibility
+    ele = WebDriverWait(self.driver, timeout, poll_frequency).until(
+        EC.visibility_of_element_located(locator)
+    )
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/support/wait.py", line 138, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+[32mINFO    [0m test:base_page.py:237 错误页面截图成功，图表保存的路径:/Users/mayun/project/solarpilot/solar_web/result/error_image/综合概览_1754379300.0853639.png
+[32mINFO    [0m test:base_page.py:204 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--获取成功
+[32mINFO    [0m test:test_1_login.py:87 用例执行通过

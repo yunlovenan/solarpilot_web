@@ -1,0 +1,75 @@
+------------open browser------------
+当前测试文件: test_3_device_add.py
+尝试使用cookies登录...
+发现 cookies 文件，正在加载...
+加载 1 个cookies...
+原始domain: .eiot6.com
+✅ 方法1成功添加cookie 1: TESTaccessToken (domain: .eiot6.com)
+❌ 方法2失败: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.184)
+Stacktrace:
+0   chromedriver                        0x000000010112a654 cxxbridge1$str$ptr + 2723108
+1   chromedriver                        0x00000001011228c8 cxxbridge1$str$ptr + 2690968
+2   chromedriver                        0x0000000100c76714 cxxbridge1$string$len + 90428
+3   chromedriver                        0x0000000100c50740 chromedriver + 132928
+4   chromedriver                        0x0000000100ce59e4 cxxbridge1$string$len + 545804
+5   chromedriver                        0x0000000100cfe908 cxxbridge1$string$len + 647984
+6   chromedriver                        0x0000000100cb19c8 cxxbridge1$string$len + 332784
+7   chromedriver                        0x00000001010ee278 cxxbridge1$str$ptr + 2476360
+8   chromedriver                        0x00000001010f150c cxxbridge1$str$ptr + 2489308
+9   chromedriver                        0x00000001010cfa64 cxxbridge1$str$ptr + 2351412
+10  chromedriver                        0x00000001010f1d94 cxxbridge1$str$ptr + 2491492
+11  chromedriver                        0x00000001010c0d58 cxxbridge1$str$ptr + 2290728
+12  chromedriver                        0x0000000101111d60 cxxbridge1$str$ptr + 2622512
+13  chromedriver                        0x0000000101111eec cxxbridge1$str$ptr + 2622908
+14  chromedriver                        0x0000000101122514 cxxbridge1$str$ptr + 2690020
+15  libsystem_pthread.dylib             0x0000000182ebe034 _pthread_start + 136
+16  libsystem_pthread.dylib             0x0000000182eb8e3c thread_start + 8
+
+❌ 方法3失败: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.184)
+Stacktrace:
+0   chromedriver                        0x000000010112a654 cxxbridge1$str$ptr + 2723108
+1   chromedriver                        0x00000001011228c8 cxxbridge1$str$ptr + 2690968
+2   chromedriver                        0x0000000100c76714 cxxbridge1$string$len + 90428
+3   chromedriver                        0x0000000100c50740 chromedriver + 132928
+4   chromedriver                        0x0000000100ce59e4 cxxbridge1$string$len + 545804
+5   chromedriver                        0x0000000100cfe908 cxxbridge1$string$len + 647984
+6   chromedriver                        0x0000000100cb19c8 cxxbridge1$string$len + 332784
+7   chromedriver                        0x00000001010ee278 cxxbridge1$str$ptr + 2476360
+8   chromedriver                        0x00000001010f150c cxxbridge1$str$ptr + 2489308
+9   chromedriver                        0x00000001010cfa64 cxxbridge1$str$ptr + 2351412
+10  chromedriver                        0x00000001010f1d94 cxxbridge1$str$ptr + 2491492
+11  chromedriver                        0x00000001010c0d58 cxxbridge1$str$ptr + 2290728
+12  chromedriver                        0x0000000101111d60 cxxbridge1$str$ptr + 2622512
+13  chromedriver                        0x0000000101111eec cxxbridge1$str$ptr + 2622908
+14  chromedriver                        0x0000000101122514 cxxbridge1$str$ptr + 2690020
+15  libsystem_pthread.dylib             0x0000000182ebe034 _pthread_start + 136
+16  libsystem_pthread.dylib             0x0000000182eb8e3c thread_start + 8
+
+刷新页面...
+加载 cookies 时出错: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.184)
+Stacktrace:
+0   chromedriver                        0x000000010112a654 cxxbridge1$str$ptr + 2723108
+1   chromedriver                        0x00000001011228c8 cxxbridge1$str$ptr + 2690968
+2   chromedriver                        0x0000000100c76714 cxxbridge1$string$len + 90428
+3   chromedriver                        0x0000000100c50740 chromedriver + 132928
+4   chromedriver                        0x0000000100ce59e4 cxxbridge1$string$len + 545804
+5   chromedriver                        0x0000000100cfe908 cxxbridge1$string$len + 647984
+6   chromedriver                        0x0000000100cb19c8 cxxbridge1$string$len + 332784
+7   chromedriver                        0x00000001010ee278 cxxbridge1$str$ptr + 2476360
+8   chromedriver                        0x00000001010f150c cxxbridge1$str$ptr + 2489308
+9   chromedriver                        0x00000001010cfa64 cxxbridge1$str$ptr + 2351412
+10  chromedriver                        0x00000001010f1d94 cxxbridge1$str$ptr + 2491492
+11  chromedriver                        0x00000001010c0d58 cxxbridge1$str$ptr + 2290728
+12  chromedriver                        0x0000000101111d60 cxxbridge1$str$ptr + 2622512
+13  chromedriver                        0x0000000101111eec cxxbridge1$str$ptr + 2622908
+14  chromedriver                        0x0000000101122514 cxxbridge1$str$ptr + 2690020
+15  libsystem_pthread.dylib             0x0000000182ebe034 _pthread_start + 136
+16  libsystem_pthread.dylib             0x0000000182eb8e3c thread_start + 8
+
+------------测试完成，保持浏览器打开------------

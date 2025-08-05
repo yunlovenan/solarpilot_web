@@ -23160,3 +23160,82 @@ selenium.common.exceptions.TimeoutException: Message:
 2025-08-04 17:12:09,643 -- [base_page.py-->line:204] - INFO: 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--获取成功
 2025-08-04 17:12:09,643 -- [test_1_login.py-->line:87] - INFO: 用例执行通过
 2025-08-04 17:12:11,655 -- [test_1_login.py-->line:60] - INFO: 登录的用例执行完毕
+2025-08-05 15:33:07,307 -- [test_3_device_add.py-->line:28] - INFO: 设备的用例执行开始
+2025-08-05 15:33:09,316 -- [base_page.py-->line:157] - ERROR: 点击元素--('xpath', "//*[contains(text(), '电站列表')]")--失败
+2025-08-05 15:33:09,316 -- [base_page.py-->line:158] - ERROR: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.184)
+Stacktrace:
+0   chromedriver                        0x000000010112a654 cxxbridge1$str$ptr + 2723108
+1   chromedriver                        0x00000001011228c8 cxxbridge1$str$ptr + 2690968
+2   chromedriver                        0x0000000100c76714 cxxbridge1$string$len + 90428
+3   chromedriver                        0x0000000100c50740 chromedriver + 132928
+4   chromedriver                        0x0000000100ce59e4 cxxbridge1$string$len + 545804
+5   chromedriver                        0x0000000100cfe908 cxxbridge1$string$len + 647984
+6   chromedriver                        0x0000000100cb19c8 cxxbridge1$string$len + 332784
+7   chromedriver                        0x00000001010ee278 cxxbridge1$str$ptr + 2476360
+8   chromedriver                        0x00000001010f150c cxxbridge1$str$ptr + 2489308
+9   chromedriver                        0x00000001010cfa64 cxxbridge1$str$ptr + 2351412
+10  chromedriver                        0x00000001010f1d94 cxxbridge1$str$ptr + 2491492
+11  chromedriver                        0x00000001010c0d58 cxxbridge1$str$ptr + 2290728
+12  chromedriver                        0x0000000101111d60 cxxbridge1$str$ptr + 2622512
+13  chromedriver                        0x0000000101111eec cxxbridge1$str$ptr + 2622908
+14  chromedriver                        0x0000000101122514 cxxbridge1$str$ptr + 2690020
+15  libsystem_pthread.dylib             0x0000000182ebe034 _pthread_start + 136
+16  libsystem_pthread.dylib             0x0000000182eb8e3c thread_start + 8
+Traceback (most recent call last):
+  File "/Users/mayun/project/solarpilot/solar_web/common/base_page.py", line 154, in click_element
+    self.driver.find_element(*locator).click()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/remote/webdriver.py", line 922, in find_element
+    return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/remote/webdriver.py", line 454, in execute
+    self.error_handler.check_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/remote/errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.184)
+Stacktrace:
+0   chromedriver                        0x000000010112a654 cxxbridge1$str$ptr + 2723108
+1   chromedriver                        0x00000001011228c8 cxxbridge1$str$ptr + 2690968
+2   chromedriver                        0x0000000100c76714 cxxbridge1$string$len + 90428
+3   chromedriver                        0x0000000100c50740 chromedriver + 132928
+4   chromedriver                        0x0000000100ce59e4 cxxbridge1$string$len + 545804
+5   chromedriver                        0x0000000100cfe908 cxxbridge1$string$len + 647984
+6   chromedriver                        0x0000000100cb19c8 cxxbridge1$string$len + 332784
+7   chromedriver                        0x00000001010ee278 cxxbridge1$str$ptr + 2476360
+8   chromedriver                        0x00000001010f150c cxxbridge1$str$ptr + 2489308
+9   chromedriver                        0x00000001010cfa64 cxxbridge1$str$ptr + 2351412
+10  chromedriver                        0x00000001010f1d94 cxxbridge1$str$ptr + 2491492
+11  chromedriver                        0x00000001010c0d58 cxxbridge1$str$ptr + 2290728
+12  chromedriver                        0x0000000101111d60 cxxbridge1$str$ptr + 2622512
+13  chromedriver                        0x0000000101111eec cxxbridge1$str$ptr + 2622908
+14  chromedriver                        0x0000000101122514 cxxbridge1$str$ptr + 2690020
+15  libsystem_pthread.dylib             0x0000000182ebe034 _pthread_start + 136
+16  libsystem_pthread.dylib             0x0000000182eb8e3c thread_start + 8
+
+2025-08-05 15:33:09,395 -- [test_3_device_add.py-->line:57] - INFO: 设备的用例执行完毕
+2025-08-05 15:34:47,078 -- [test_1_login.py-->line:31] - INFO: 开始执行登录的用例
+2025-08-05 15:34:49,406 -- [base_page.py-->line:185] - INFO: 文本内容输入--('css selector', 'input[type="text"]')--成功
+2025-08-05 15:34:49,526 -- [base_page.py-->line:185] - INFO: 文本内容输入--('css selector', 'input[type="password"]')--成功
+2025-08-05 15:34:49,573 -- [base_page.py-->line:163] - INFO: 元素--('css selector', 'input[type="checkbox"]')--点击成功
+2025-08-05 15:34:49,643 -- [base_page.py-->line:163] - INFO: 元素--('xpath', "//span[text()='登 录']")--点击成功
+2025-08-05 15:34:54,697 -- [base_page.py-->line:163] - INFO: 元素--('xpath', "//*[contains(text(), '我是服务商')]")--点击成功
+2025-08-05 15:35:00,080 -- [base_page.py-->line:37] - ERROR: 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--等待可见超时
+2025-08-05 15:35:00,081 -- [base_page.py-->line:38] - ERROR: Message: 
+Traceback (most recent call last):
+  File "/Users/mayun/project/solarpilot/solar_web/common/base_page.py", line 32, in wait_element_visibility
+    ele = WebDriverWait(self.driver, timeout, poll_frequency).until(
+        EC.visibility_of_element_located(locator)
+    )
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/support/wait.py", line 138, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+2025-08-05 15:35:01,040 -- [base_page.py-->line:237] - INFO: 错误页面截图成功，图表保存的路径:/Users/mayun/project/solarpilot/solar_web/result/error_image/综合概览_1754379300.0853639.png
+2025-08-05 15:35:01,047 -- [base_page.py-->line:204] - INFO: 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--获取成功
+2025-08-05 15:35:01,047 -- [test_1_login.py-->line:87] - INFO: 用例执行通过
+2025-08-05 15:35:03,064 -- [test_1_login.py-->line:60] - INFO: 登录的用例执行完毕
