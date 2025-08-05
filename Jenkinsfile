@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        PYTHON_VERSION = '3.13'
+        PYTHON_VERSION = '3.11'
         PROJECT_NAME = 'solar_web'
     }
     
@@ -18,25 +18,53 @@ pipeline {
             steps {
                 echo '🔧 设置环境...'
                 script {
+                    // 使用sudo权限安装系统依赖
+                    sh '''
+                        # 更新包管理器
+                        sudo apt-get update || true
+                        
+                        # 安装Python3和pip（如果需要）
+                        if ! command -v python3 &> /dev/null; then
+                            sudo apt-get install -y python3 python3-pip
+                        fi
+                        
+                        # 安装Chrome浏览器
+                        if ! command -v google-chrome &> /dev/null; then
+                            echo "安装Chrome浏览器..."
+                            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+                            sudo apt-get update
+                            sudo apt-get install -y google-chrome-stable
+                        fi
+                        
+                        # 安装ChromeDriver
+                        if ! command -v chromedriver &> /dev/null; then
+                            echo "安装ChromeDriver..."
+                            CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\\.[0-9]+\\.[0-9]+")
+                            CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+                            wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+                            sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+                            sudo chmod +x /usr/local/bin/chromedriver
+                            rm /tmp/chromedriver.zip
+                        fi
+                        
+                        # 安装Allure
+                        if ! command -v allure &> /dev/null; then
+                            echo "安装Allure..."
+                            curl -o allure-2.24.1.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.24.1/allure-commandline-2.24.1.tgz
+                            sudo tar -zxvf allure-2.24.1.tgz -C /opt/
+                            sudo ln -s /opt/allure-2.24.1/bin/allure /usr/local/bin/allure
+                            rm allure-2.24.1.tgz
+                        fi
+                    '''
+                    
                     // 安装Python依赖
                     sh '''
                         python3 -m pip install --upgrade pip
                         python3 -m pip install -r requirements.txt
-                    '''
-                    
-                    // 安装Chrome和ChromeDriver（如果需要）
-                    sh '''
-                        # 检查Chrome是否已安装
-                        if ! command -v google-chrome &> /dev/null; then
-                            echo "安装Chrome浏览器..."
-                            # 这里可以根据系统添加Chrome安装命令
-                        fi
                         
-                        # 检查ChromeDriver是否已安装
-                        if ! command -v chromedriver &> /dev/null; then
-                            echo "安装ChromeDriver..."
-                            # 这里可以根据系统添加ChromeDriver安装命令
-                        fi
+                        # 验证pytest安装
+                        python3 -m pytest --version
                     '''
                 }
             }
@@ -52,7 +80,8 @@ pipeline {
                     
                     // 运行测试
                     sh '''
-                        python3 jenkins_run.py
+                        # 使用python3 -m pytest确保命令可用
+                        python3 -m pytest testcase/ -v --alluredir=allure_report --junitxml=junit.xml
                     '''
                 }
             }
@@ -80,9 +109,9 @@ pipeline {
                 script {
                     // 归档测试报告
                     archiveArtifacts artifacts: 'junit.xml', fingerprint: true
-                    archiveArtifacts artifacts: 'test_reports/*.html', fingerprint: true
                     archiveArtifacts artifacts: 'allure_report/**/*', fingerprint: true
                     archiveArtifacts artifacts: 'result/logs/*.log', fingerprint: true
+                    archiveArtifacts artifacts: 'result/error_image/*.png', fingerprint: true
                 }
             }
         }

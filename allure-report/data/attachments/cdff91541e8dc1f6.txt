@@ -1,0 +1,20 @@
+2025-08-05 17:03:26,649 -- [test_1_login.py-->line:31] - INFO: 开始执行登录的用例
+2025-08-05 17:03:28,950 -- [base_page.py-->line:185] - INFO: 文本内容输入--('css selector', 'input[type="text"]')--成功
+2025-08-05 17:03:29,039 -- [base_page.py-->line:185] - INFO: 文本内容输入--('css selector', 'input[type="password"]')--成功
+2025-08-05 17:03:29,071 -- [base_page.py-->line:163] - INFO: 元素--('css selector', 'input[type="checkbox"]')--点击成功
+2025-08-05 17:03:29,107 -- [base_page.py-->line:163] - INFO: 元素--('xpath', "//span[text()='登 录']")--点击成功
+2025-08-05 17:03:34,167 -- [base_page.py-->line:163] - INFO: 元素--('xpath', "//*[contains(text(), '我是服务商')]")--点击成功
+2025-08-05 17:03:39,312 -- [base_page.py-->line:37] - ERROR: 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--等待可见超时
+2025-08-05 17:03:39,313 -- [base_page.py-->line:38] - ERROR: Message: 
+Traceback (most recent call last):
+  File "/Users/mayun/project/solarpilot/solar_web/common/base_page.py", line 32, in wait_element_visibility
+    ele = WebDriverWait(self.driver, timeout, poll_frequency).until(
+        EC.visibility_of_element_located(locator)
+    )
+  File "/Users/mayun/Library/Python/3.13/lib/python/site-packages/selenium/webdriver/support/wait.py", line 138, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+2025-08-05 17:03:39,372 -- [base_page.py-->line:237] - INFO: 错误页面截图成功，图表保存的路径:/Users/mayun/project/solarpilot/solar_web/result/error_image/综合概览_1754384619.315212.png
+2025-08-05 17:03:39,378 -- [base_page.py-->line:204] - INFO: 元素--('xpath', "//*[contains(text(), '综合概览') or contains(text(), '光伏运营')]")--获取成功
+2025-08-05 17:03:39,378 -- [test_1_login.py-->line:87] - INFO: 用例执行通过
