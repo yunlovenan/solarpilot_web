@@ -1,0 +1,4 @@
+检测到登录成功，正在保存cookies...
+✅ 成功保存 1 个cookies到文件: ../solar_cookies.json
+✅ cookies已保存，后续用例可使用cookies登录
+------------测试完成，保持浏览器打开------------

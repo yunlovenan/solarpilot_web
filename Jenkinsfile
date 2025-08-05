@@ -158,10 +158,19 @@ pipeline {
                         which python3
                         python3 -m pytest --version
                         
+                        # 清理旧的测试结果
+                        rm -rf allure-results allure_report
+                        mkdir -p allure-results
+                        
                         # 使用python3 -m pytest确保命令可用
-                        python3 -m pytest testcase/ -v --alluredir=allure_report --junitxml=junit.xml --tb=short
+                        python3 -m pytest testcase/ -v --alluredir=allure-results --junitxml=junit.xml --tb=short
                         
                         echo "测试运行完成"
+                        
+                        # 检查生成的测试结果
+                        echo "检查测试结果..."
+                        ls -la allure-results/ || echo "allure-results目录不存在"
+                        find allure-results -name "*.json" | head -5
                     '''
                 }
             }
@@ -173,12 +182,44 @@ pipeline {
                 script {
                     // 生成Allure报告
                     sh '''
+                        echo "生成Allure报告..."
+                        
+                        # 检查allure命令
                         if command -v allure &> /dev/null; then
-                            echo "生成Allure报告..."
-                            allure generate allure_report --clean
-                            echo "✅ Allure报告生成完成"
+                            echo "✅ Allure已安装: $(allure --version)"
+                            
+                            # 检查测试结果目录
+                            if [ -d "allure-results" ]; then
+                                echo "✅ 找到测试结果目录"
+                                ls -la allure-results/
+                                
+                                # 生成Allure报告
+                                allure generate allure-results --clean -o allure-report
+                                
+                                if [ $? -eq 0 ]; then
+                                    echo "✅ Allure报告生成成功"
+                                    ls -la allure-report/
+                                else
+                                    echo "❌ Allure报告生成失败"
+                                fi
+                            else
+                                echo "❌ 测试结果目录不存在"
+                            fi
                         else
-                            echo "⚠️ Allure未安装，跳过报告生成"
+                            echo "❌ Allure未安装"
+                            
+                            # 尝试安装Allure
+                            echo "尝试安装Allure..."
+                            curl -o allure-2.24.1.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.24.1/allure-commandline-2.24.1.tgz
+                            sudo tar -zxvf allure-2.24.1.tgz -C /opt/
+                            sudo ln -s /opt/allure-2.24.1/bin/allure /usr/local/bin/allure
+                            rm allure-2.24.1.tgz
+                            
+                            # 重新生成报告
+                            if command -v allure &> /dev/null; then
+                                echo "✅ Allure安装成功，重新生成报告"
+                                allure generate allure-results --clean -o allure-report
+                            fi
                         fi
                     '''
                 }
