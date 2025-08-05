@@ -158,12 +158,8 @@ pipeline {
                         which python3
                         python3 -m pytest --version
                         
-                        # 清理旧的测试结果
-                        rm -rf allure-results allure_report
-                        mkdir -p allure-results
-                        
-                        # 使用python3 -m pytest确保命令可用
-                        python3 -m pytest testcase/ -v --alluredir=allure-results --junitxml=junit.xml --tb=short
+                        # 使用专门的测试运行器
+                        python3 jenkins_test_runner.py
                         
                         echo "测试运行完成"
                         
@@ -171,6 +167,10 @@ pipeline {
                         echo "检查测试结果..."
                         ls -la allure-results/ || echo "allure-results目录不存在"
                         find allure-results -name "*.json" | head -5
+                        
+                        # 显示测试结果统计
+                        echo "测试结果统计:"
+                        find allure-results -name "*.json" | wc -l
                     '''
                 }
             }
@@ -232,9 +232,25 @@ pipeline {
                 script {
                     // 归档测试报告
                     archiveArtifacts artifacts: 'junit.xml', fingerprint: true
-                    archiveArtifacts artifacts: 'allure_report/**/*', fingerprint: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', fingerprint: true
                     archiveArtifacts artifacts: 'result/logs/*.log', fingerprint: true
                     archiveArtifacts artifacts: 'result/error_image/*.png', fingerprint: true
+                }
+            }
+        }
+        
+        stage('Allure Report') {
+            steps {
+                echo '📊 生成Allure报告...'
+                script {
+                    // 使用Allure插件生成报告
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-results']]
+                    ])
                 }
             }
         }
