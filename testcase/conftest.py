@@ -135,10 +135,23 @@ def driver():
     print(f'当前测试文件: {current_test_file}')
     
     chromeOptions = webdriver.ChromeOptions()
-    # 设定下载文件的保存目录，
-    # 如果该目录不存在，将会自动创建
-    prefs = {"download.default_directory": "E:\\testDownload"}
-    # 将自定义设置添加到Chrome配置对象实例中
+    
+    # 检查是否在Jenkins环境中运行
+    is_jenkins = os.environ.get('JENKINS_URL') is not None or os.environ.get('BUILD_NUMBER') is not None
+    is_headless = conf.getboolean('env', 'headless') or is_jenkins
+    
+    if is_headless:
+        print("🔧 使用无头模式运行")
+        chromeOptions.add_argument('--headless')
+        chromeOptions.add_argument('--no-sandbox')
+        chromeOptions.add_argument('--disable-dev-shm-usage')
+        chromeOptions.add_argument('--disable-gpu')
+        chromeOptions.add_argument('--window-size=1920,1080')
+    else:
+        print("🖥️ 使用有界面模式运行")
+    
+    # 设定下载文件的保存目录
+    prefs = {"download.default_directory": "/tmp/testDownload"}
     chromeOptions.add_experimental_option("prefs", prefs)
     chromeOptions.add_argument("--ignore-certificate-errors")
     chromeOptions.add_argument('--unlimited-storage')
@@ -147,10 +160,6 @@ def driver():
     chromeOptions.add_argument('--proxy-bypass-list=*')
     chromeOptions.add_argument('--disable-web-security')
     chromeOptions.add_argument('--allow-running-insecure-content')
-    # 移除无头模式，让浏览器窗口可见
-    chromeOptions.add_argument('--disable-gpu')
-    chromeOptions.add_argument('--no-sandbox')
-    chromeOptions.add_argument('--disable-dev-shm-usage')
     
     # 使用本地安装的ChromeDriver
     chrome_driver_path = "/opt/homebrew/bin/chromedriver"

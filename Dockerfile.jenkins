@@ -1,0 +1,63 @@
+# 使用Python 3.13作为基础镜像
+FROM python:3.13-slim
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    unzip \
+    curl \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装Chrome浏览器
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | awk -F'.' '{print $1}') \
+    && wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" -O /tmp/chromedriver_version \
+    && CHROMEDRIVER_VERSION=$(cat /tmp/chromedriver_version) \
+    && wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
+    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
+    && rm /tmp/chromedriver.zip /tmp/chromedriver_version \
+    && chmod +x /usr/local/bin/chromedriver
+
+# 安装Allure命令行工具
+RUN curl -o allure-2.24.1.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.24.1/allure-commandline-2.24.1.tgz \
+    && tar -zxvf allure-2.24.1.tgz -C /opt/ \
+    && ln -s /opt/allure-2.24.1/bin/allure /usr/local/bin/allure \
+    && rm allure-2.24.1.tgz
+
+# 复制项目文件
+COPY requirements.txt .
+COPY conf/ ./conf/
+COPY common/ ./common/
+COPY data/ ./data/
+COPY locator/ ./locator/
+COPY page/ ./page/
+COPY testcase/ ./testcase/
+COPY *.py .
+
+# 安装Python依赖
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 创建必要的目录
+RUN mkdir -p allure_report test_reports result/logs result/error_image
+
+# 设置环境变量
+ENV DISPLAY=:99
+ENV CHROME_HEADLESS=true
+ENV PYTHONPATH=/app
+
+# 设置启动脚本权限
+RUN chmod +x jenkins_run.py
+
+# 默认命令
+CMD ["python3", "jenkins_run.py"] 
