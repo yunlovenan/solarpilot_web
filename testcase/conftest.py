@@ -1,5 +1,6 @@
 
 
+
 from selenium import webdriver
 from selenium.webdriver import Chrome
 
@@ -162,83 +163,24 @@ def driver():
     chromeOptions.add_argument('--disable-web-security')
     chromeOptions.add_argument('--allow-running-insecure-content')
     
-    # 智能检测ChromeDriver路径
-    def find_chromedriver():
-        """查找ChromeDriver路径"""
-        possible_paths = [
-            "/usr/local/bin/chromedriver",  # Linux Jenkins
-            "/opt/homebrew/bin/chromedriver",  # macOS
-            "/usr/bin/chromedriver",  # Linux系统
-            "chromedriver",  # PATH中的chromedriver
-        ]
-        
-        for path in possible_paths:
-            if os.path.exists(path):
-                print(f"✅ 找到ChromeDriver: {path}")
-                return path
-        
-        print("❌ 未找到ChromeDriver，尝试自动下载...")
-        return None
+    # 检查是否在Jenkins环境中运行
+    is_jenkins = os.environ.get('JENKINS_URL') is not None or os.environ.get('BUILD_NUMBER') is not None
+    is_headless = conf.getboolean('env', 'headless') or is_jenkins
     
-    chrome_driver_path = find_chromedriver()
+    if is_headless:
+        print("🔧 使用无头模式运行")
+        chromeOptions.add_argument('--headless')
+        chromeOptions.add_argument('--no-sandbox')
+        chromeOptions.add_argument('--disable-dev-shm-usage')
+        chromeOptions.add_argument('--disable-gpu')
+        chromeOptions.add_argument('--window-size=1920,1080')
+    else:
+        print("🖥️ 使用有界面模式运行")
     
-    # 如果找不到ChromeDriver，尝试自动下载
-    if not chrome_driver_path:
-        try:
-            import subprocess
-            import platform
-            
-            print("🔧 尝试自动安装ChromeDriver...")
-            
-            # 检测Chrome版本
-            chrome_version_cmd = "google-chrome --version"
-            try:
-                result = subprocess.run(chrome_version_cmd, shell=True, capture_output=True, text=True)
-                if result.returncode == 0:
-                    version_line = result.stdout.strip()
-                    chrome_version = version_line.split()[-1]  # 获取版本号
-                    print(f"检测到Chrome版本: {chrome_version}")
-                    
-                    # 下载对应版本的ChromeDriver
-                    major_version = chrome_version.split('.')[0]
-                    download_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}"
-                    
-                    # 获取ChromeDriver版本
-                    version_result = subprocess.run(f"curl -s {download_url}", shell=True, capture_output=True, text=True)
-                    if version_result.returncode == 0:
-                        chromedriver_version = version_result.stdout.strip()
-                        print(f"下载ChromeDriver版本: {chromedriver_version}")
-                        
-                        # 下载ChromeDriver
-                        download_cmd = f"wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_linux64.zip"
-                        subprocess.run(download_cmd, shell=True, check=True)
-                        
-                        # 解压并安装
-                        subprocess.run("sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/", shell=True, check=True)
-                        subprocess.run("sudo chmod +x /usr/local/bin/chromedriver", shell=True, check=True)
-                        subprocess.run("rm /tmp/chromedriver.zip", shell=True, check=True)
-                        
-                        chrome_driver_path = "/usr/local/bin/chromedriver"
-                        print("✅ ChromeDriver自动安装成功")
-                    else:
-                        print("❌ 无法获取ChromeDriver版本")
-                else:
-                    print("❌ 无法检测Chrome版本")
-            except Exception as e:
-                print(f"❌ 自动安装ChromeDriver失败: {e}")
-        except Exception as e:
-            print(f"❌ ChromeDriver安装过程出错: {e}")
-    
-    # 尝试启动Chrome
-    driver = None
+    # 直接使用Selenium Manager自动管理ChromeDriver
+    print("🚀 使用Selenium Manager自动管理ChromeDriver")
     try:
-        if chrome_driver_path:
-            print(f"🚀 使用ChromeDriver: {chrome_driver_path}")
-            driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
-        else:
-            print("🚀 使用Selenium Manager自动管理ChromeDriver")
-            driver = webdriver.Chrome(options=chromeOptions)
-        
+        driver = webdriver.Chrome(options=chromeOptions)
         driver.maximize_window()
         # chrome由于每次都打开设置页面，暂时没有找到关闭的方法，需要切换操作窗口(火狐浏览器不需要切换窗口)
         windows = driver.window_handles  # 获取所有窗口
@@ -247,20 +189,20 @@ def driver():
         
     except Exception as e:
         print(f"❌ Chrome启动失败: {e}")
-        print("🔄 尝试使用无头模式...")
+        print("🔄 尝试使用备用配置...")
         
-        # 添加无头模式选项
+        # 添加更多无头模式选项
         chromeOptions.add_argument('--headless')
         chromeOptions.add_argument('--no-sandbox')
         chromeOptions.add_argument('--disable-dev-shm-usage')
         chromeOptions.add_argument('--disable-gpu')
         chromeOptions.add_argument('--window-size=1920,1080')
+        chromeOptions.add_argument('--disable-extensions')
+        chromeOptions.add_argument('--disable-plugins')
+        chromeOptions.add_argument('--disable-images')
         
         try:
-            if chrome_driver_path:
-                driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
-            else:
-                driver = webdriver.Chrome(options=chromeOptions)
+            driver = webdriver.Chrome(options=chromeOptions)
             print("✅ 无头模式Chrome启动成功")
         except Exception as e2:
             print(f"❌ 无头模式也启动失败: {e2}")
