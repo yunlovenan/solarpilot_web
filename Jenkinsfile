@@ -45,12 +45,33 @@ pipeline {
                         # 安装ChromeDriver
                         if ! command -v chromedriver &> /dev/null; then
                             echo "安装ChromeDriver..."
-                            CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\\.[0-9]+\\.[0-9]+")
-                            CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-                            wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-                            sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
-                            sudo chmod +x /usr/local/bin/chromedriver
-                            rm /tmp/chromedriver.zip
+                            
+                            # 检测Chrome版本
+                            if command -v google-chrome &> /dev/null; then
+                                CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\\.[0-9]+\\.[0-9]+")
+                                echo "检测到Chrome版本: $CHROME_VERSION"
+                                
+                                # 获取ChromeDriver版本
+                                MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d. -f1)
+                                echo "Chrome主版本: $MAJOR_VERSION"
+                                
+                                # 下载对应版本的ChromeDriver
+                                CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
+                                echo "下载ChromeDriver版本: $CHROMEDRIVER_VERSION"
+                                
+                                # 下载并安装ChromeDriver
+                                wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+                                sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+                                sudo chmod +x /usr/local/bin/chromedriver
+                                rm /tmp/chromedriver.zip
+                                
+                                echo "✅ ChromeDriver安装完成: $(chromedriver --version)"
+                            else
+                                echo "❌ Chrome未安装，无法确定ChromeDriver版本"
+                                exit 1
+                            fi
+                        else
+                            echo "✅ ChromeDriver已安装: $(chromedriver --version)"
                         fi
                         
                         # 安装Allure
