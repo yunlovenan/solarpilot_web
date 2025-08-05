@@ -55,49 +55,60 @@ def device_fixture(driver):
     yield device_page
     # 后置条件
     log.info("设备的用例执行完毕")
-@allure.feature('设备')
-@allure.description('设备添加')
-class TestDetector:
-    """测试设备"""
+@allure.epic('Solar系统')
+@allure.feature('设备管理')
+@allure.story('设备添加')
+class TestDeviceAdd:
+    """测试设备添加"""
+    
     device_case_data = [{"zigbee_sn":"GW1123C21122"}]
     
-    @allure.story('设备添加')
-    @allure.title('正常添加')
+    @allure.title('正常添加设备')
+    @allure.description('测试正常添加设备功能')
+    @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.parametrize("case", device_case_data)
-    def test_site_add_pass(self, case, device_fixture):
-        device_page = device_fixture
-        # 进行添加监测器的操作（sn、imei唯一）
-        case['gateway_name'] = 'gateway_'+str(int(time.time() * 1000))
-        device_page.device_add(case['zigbee_sn'], case['gateway_name'])
+    def test_device_add_pass(self, case, device_fixture):
+        """测试设备添加成功"""
+        with allure.step("准备测试数据"):
+            device_page = device_fixture
+            # 进行添加设备的操作（sn、imei唯一）
+            case['gateway_name'] = 'gateway_'+str(int(time.time() * 1000))
+            print(f"测试数据: {case}")
         
-        # #校验设备激活结果
-        # result = device_page.device_add_result()
+        with allure.step("执行设备添加"):
+            try:
+                device_page.device_add(case['zigbee_sn'], case['gateway_name'])
+                print("设备添加操作完成")
+            except Exception as e:
+                allure.attach(f"设备添加失败: {str(e)}", "错误信息", allure.attachment_type.TEXT)
+                raise e
         
-        # 校验设备添加(通过页面列表查询校验)
-        res = device_fixture.device_add_check(case['gateway_name'])
-        print(res)
-        
-      
-
-   
-
-        # #校验站点添加（通过查询数据库校验）
-        # time.sleep(3)
-        # sql = "select *from detector where imei = '{}'".format(case['imei'])
-        # res = db.find_one(sql)
-
-        # 断言用例执行是否通过
-        try:
-            assert case['gateway_name'] in res
-        except AssertionError as e:
-            log.error("用例执行失败")
-            log.exception(e)
-            raise e
-        else:
-            log.info("用例执行通过")
-            excel.write_data(5,7,json.dumps(case))
-            setattr(EnvData,"device_sn",case['zigbee_sn'])
-            setattr(EnvData,"device_name",case['gateway_name'])
+        with allure.step("校验设备添加结果"):
+            try:
+                # 校验设备添加(通过页面列表查询校验)
+                res = device_fixture.device_add_check(case['gateway_name'])
+                print(f"查询结果: {res}")
+                allure.attach(f"查询结果: {res}", "查询结果", allure.attachment_type.TEXT)
+                
+                # 断言用例执行是否通过
+                assert case['gateway_name'] in res, f"设备名称 {case['gateway_name']} 未在结果中找到"
+                
+                log.info("用例执行通过")
+                excel.write_data(5,7,json.dumps(case))
+                setattr(EnvData,"device_sn",case['zigbee_sn'])
+                setattr(EnvData,"device_name",case['gateway_name'])
+                
+                allure.attach(f"设备添加成功: {case['gateway_name']}", "成功信息", allure.attachment_type.TEXT)
+                
+            except AssertionError as e:
+                log.error("用例执行失败")
+                log.exception(e)
+                allure.attach(f"断言失败: {str(e)}", "失败信息", allure.attachment_type.TEXT)
+                raise e
+            except Exception as e:
+                log.error(f"校验过程发生异常: {e}")
+                allure.attach(f"校验异常: {str(e)}", "异常信息", allure.attachment_type.TEXT)
+                raise e
             #setattr(EnvData, "detectorId", res['id'])
 
 

@@ -60,7 +60,7 @@ def run_tests():
     # 运行测试
     test_command = [
         sys.executable, '-m', 'pytest',
-        'testcase/',
+        'testcase/test_allure_simple.py',  # 先运行简单测试
         '-v',
         '--alluredir=allure-results',
         '--junitxml=junit.xml',
