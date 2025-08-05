@@ -52,6 +52,54 @@ pipeline {
                         
                         # 验证Chrome安装
                         google-chrome --version
+                        
+                        # 检查架构并安装ChromeDriver
+                        ARCH=$(uname -m)
+                        echo "检测到架构: $ARCH"
+                        
+                        if [ "$ARCH" = "aarch64" ]; then
+                            echo "🔧 ARM64架构，安装ChromeDriver..."
+                            
+                            # 检查ChromeDriver是否已安装
+                            if ! command -v chromedriver &> /dev/null; then
+                                echo "📦 安装ChromeDriver..."
+                                
+                                # 检测Chrome版本
+                                CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\\.[0-9]+\\.[0-9]+")
+                                echo "检测到Chrome版本: $CHROME_VERSION"
+                                
+                                # 获取Chrome主版本号
+                                MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d. -f1)
+                                echo "Chrome主版本: $MAJOR_VERSION"
+                                
+                                # 获取对应的ChromeDriver版本
+                                echo "获取ChromeDriver版本..."
+                                CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
+                                
+                                if [ -n "$CHROMEDRIVER_VERSION" ]; then
+                                    echo "下载ChromeDriver版本: $CHROMEDRIVER_VERSION"
+                                    
+                                    # 下载ChromeDriver
+                                    echo "下载ChromeDriver..."
+                                    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+                                    
+                                    # 解压并安装
+                                    echo "安装ChromeDriver..."
+                                    sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+                                    sudo chmod +x /usr/local/bin/chromedriver
+                                    rm /tmp/chromedriver.zip
+                                    
+                                    echo "✅ ChromeDriver安装完成: $(chromedriver --version)"
+                                else
+                                    echo "❌ 无法获取ChromeDriver版本"
+                                    exit 1
+                                fi
+                            else
+                                echo "✅ ChromeDriver已安装: $(chromedriver --version)"
+                            fi
+                        else
+                            echo "✅ x86_64架构，使用Selenium Manager自动管理ChromeDriver"
+                        fi
                     '''
                     
                     // 安装Python依赖

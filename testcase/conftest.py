@@ -177,10 +177,79 @@ def driver():
     else:
         print("🖥️ 使用有界面模式运行")
     
-    # 直接使用Selenium Manager自动管理ChromeDriver
-    print("🚀 使用Selenium Manager自动管理ChromeDriver")
+    # 智能ChromeDriver管理
+    def setup_chromedriver():
+        """设置ChromeDriver"""
+        import subprocess
+        import platform
+        
+        # 检查是否在ARM64架构上
+        if platform.machine() == 'aarch64':
+            print("🔧 检测到ARM64架构，使用手动ChromeDriver安装")
+            
+            # 检查ChromeDriver是否已安装
+            if not subprocess.run(['which', 'chromedriver'], capture_output=True).returncode == 0:
+                print("📦 安装ChromeDriver...")
+                
+                # 检测Chrome版本
+                try:
+                    result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
+                    if result.returncode == 0:
+                        version_line = result.stdout.strip()
+                        chrome_version = version_line.split()[-1]
+                        major_version = chrome_version.split('.')[0]
+                        print(f"检测到Chrome版本: {chrome_version}")
+                        
+                        # 下载ARM64版本的ChromeDriver
+                        download_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}"
+                        version_result = subprocess.run(['curl', '-s', download_url], capture_output=True, text=True)
+                        
+                        if version_result.returncode == 0:
+                            chromedriver_version = version_result.stdout.strip()
+                            print(f"下载ChromeDriver版本: {chromedriver_version}")
+                            
+                            # 下载ARM64版本的ChromeDriver
+                            download_cmd = [
+                                'wget', '-O', '/tmp/chromedriver.zip',
+                                f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_linux64.zip'
+                            ]
+                            subprocess.run(download_cmd, check=True)
+                            
+                            # 解压并安装
+                            subprocess.run(['sudo', 'unzip', '/tmp/chromedriver.zip', '-d', '/usr/local/bin/'], check=True)
+                            subprocess.run(['sudo', 'chmod', '+x', '/usr/local/bin/chromedriver'], check=True)
+                            subprocess.run(['rm', '/tmp/chromedriver.zip'], check=True)
+                            
+                            print("✅ ChromeDriver安装完成")
+                            return "/usr/local/bin/chromedriver"
+                        else:
+                            print("❌ 无法获取ChromeDriver版本")
+                    else:
+                        print("❌ 无法检测Chrome版本")
+                except Exception as e:
+                    print(f"❌ ChromeDriver安装失败: {e}")
+            
+            # 检查ChromeDriver是否可用
+            if subprocess.run(['which', 'chromedriver'], capture_output=True).returncode == 0:
+                chromedriver_path = subprocess.run(['which', 'chromedriver'], capture_output=True, text=True).stdout.strip()
+                print(f"✅ 找到ChromeDriver: {chromedriver_path}")
+                return chromedriver_path
+        
+        return None
+    
+    # 尝试设置ChromeDriver
+    chrome_driver_path = setup_chromedriver()
+    
+    # 尝试启动Chrome
+    driver = None
     try:
-        driver = webdriver.Chrome(options=chromeOptions)
+        if chrome_driver_path:
+            print(f"🚀 使用ChromeDriver: {chrome_driver_path}")
+            driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
+        else:
+            print("🚀 尝试使用Selenium Manager自动管理ChromeDriver")
+            driver = webdriver.Chrome(options=chromeOptions)
+        
         driver.maximize_window()
         # chrome由于每次都打开设置页面，暂时没有找到关闭的方法，需要切换操作窗口(火狐浏览器不需要切换窗口)
         windows = driver.window_handles  # 获取所有窗口
@@ -202,7 +271,10 @@ def driver():
         chromeOptions.add_argument('--disable-images')
         
         try:
-            driver = webdriver.Chrome(options=chromeOptions)
+            if chrome_driver_path:
+                driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
+            else:
+                driver = webdriver.Chrome(options=chromeOptions)
             print("✅ 无头模式Chrome启动成功")
         except Exception as e2:
             print(f"❌ 无头模式也启动失败: {e2}")
