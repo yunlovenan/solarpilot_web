@@ -158,8 +158,12 @@ pipeline {
                         which python3
                         python3 -m pytest --version
                         
-                        # 使用专门的测试运行器
-                        python3 jenkins_test_runner.py
+                        # 清理旧的测试结果
+                        rm -rf allure-results ALLURE-RESULTS allure-report
+                        mkdir -p allure-results
+                        
+                        # 直接运行基础测试
+                        python3 -m pytest testcase/test_basic_allure.py -v --alluredir=allure-results --junitxml=junit.xml --tb=short
                         
                         echo "测试运行完成"
                         
@@ -171,6 +175,15 @@ pipeline {
                         # 显示测试结果统计
                         echo "测试结果统计:"
                         find allure-results -name "*.json" | wc -l
+                        
+                        # 显示测试结果内容
+                        echo "测试结果内容:"
+                        for file in allure-results/*.json; do
+                            if [ -f "$file" ]; then
+                                echo "文件: $file"
+                                head -5 "$file"
+                            fi
+                        done
                     '''
                 }
             }
@@ -220,6 +233,20 @@ pipeline {
                                 echo "✅ Allure安装成功，重新生成报告"
                                 allure generate allure-results --clean -o allure-report
                             fi
+                        fi
+                        
+                        # 检查生成的报告
+                        if [ -d "allure-report" ]; then
+                            echo "✅ 报告目录存在"
+                            ls -la allure-report/
+                            if [ -f "allure-report/index.html" ]; then
+                                echo "✅ index.html存在"
+                                echo "报告大小: $(du -sh allure-report/)"
+                            else
+                                echo "❌ index.html不存在"
+                            fi
+                        else
+                            echo "❌ 报告目录不存在"
                         fi
                     '''
                 }
