@@ -172,6 +172,14 @@ pipeline {
                         echo "运行test_1_login.py..."
                         python3 -m pytest testcase/test_1_login.py -v --alluredir=allure_report --junitxml=junit.xml --tb=short --no-cov
                         
+                        # 确保ALLURE-RESULTS目录存在并复制文件
+                        echo "复制测试结果到ALLURE-RESULTS目录..."
+                        mkdir -p ALLURE-RESULTS
+                        if [ -d "allure_report" ]; then
+                            cp -r allure_report/* ALLURE-RESULTS/ 2>/dev/null || echo "复制失败，但继续执行"
+                            echo "✅ 测试结果已复制到ALLURE-RESULTS"
+                        fi
+                        
 
                         
                         echo "测试运行完成"
@@ -289,7 +297,7 @@ pipeline {
                         jdk: '',
                         properties: [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'allure_report']]
+                        results: [[path: 'ALLURE-RESULTS']]
                     ])
                 }
             }
