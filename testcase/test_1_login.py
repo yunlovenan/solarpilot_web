@@ -60,54 +60,80 @@ def login_fixture(driver):
     log.info("登录的用例执行完毕")
     
     
-@allure.feature('登录流程')
-@allure.description('登录界面功能测试')
+@allure.epic('Solar系统')
+@allure.feature('登录模块')
+@allure.story('用户登录')
 class TestLogin:
     """测试登录"""
     login_case_data = []
     login_case_data.append(eval(cases[0]['data'])) #读取excel中的数据
-    @allure.story('正确用户名密码登录')
-    @allure.title('登录成功场景')
+    
+    @allure.title('正确用户名密码登录成功')
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.description('使用正确的用户名和密码进行登录测试')
     @pytest.mark.parametrize("case", login_case_data)
     def test_login_pass(self, case, login_fixture):
-        print(case)
-        login_page, index_page = login_fixture
-        # 进行登录的操作
-        login_page.login(case['username'], case['password'])
-        # 获取登录之后的用户信息
-        res = index_page.get_my_user_info()
-        # 断言用例执行是否通过
-        try:
-            assert '登录成功' == res
-        except AssertionError as e:
-            log.error("用例执行失败")
-            log.exception(e)
-            raise e
-        else:
-            log.info("用例执行通过")
-            # 退出登录，重新访问登录页面
-         #   index_page.click_quit()
-            # 重新进入登录页面
-          #  login_page.page_refresh()
+        """测试正确用户名密码登录"""
+        with allure.step("准备登录数据"):
+            print(case)
+            allure.attach(str(case), "测试数据", allure.attachment_type.TEXT)
+        
+        with allure.step("执行登录操作"):
+            login_page, index_page = login_fixture
+            # 进行登录的操作
+            login_page.login(case['username'], case['password'])
+        
+        with allure.step("获取登录结果"):
+            # 获取登录之后的用户信息
+            res = index_page.get_my_user_info()
+            allure.attach(res, "登录结果", allure.attachment_type.TEXT)
+        
+        with allure.step("验证登录结果"):
+            # 断言用例执行是否通过
+            try:
+                assert '登录成功' == res
+                allure.attach("登录成功", "断言结果", allure.attachment_type.TEXT)
+            except AssertionError as e:
+                log.error("用例执行失败")
+                log.exception(e)
+                allure.attach(str(e), "断言失败", allure.attachment_type.TEXT)
+                raise e
+            else:
+                log.info("用例执行通过")
+                allure.attach("测试通过", "测试结果", allure.attachment_type.TEXT)
+    
     @pytest.mark.skip
-    @allure.story('错误用户名密码登录')
-    @allure.title('登录失败场景')
+    @allure.title('错误用户名密码登录失败')
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.description('使用错误的用户名和密码进行登录测试')
     @pytest.mark.parametrize('case', LoginCase.error_case_data)
     def test_login_error_case(self, case, login_fixture):
         """异常用例，窗口上有提示"""
-        login_page, index_page = login_fixture
-        # 刷新页面
-        login_page.page_refresh()
-        # 执行登录操作
-        login_page.login(case['username'], case['password'])
-        # 获取实际提示结果
-        result = login_page.get_error_info()
-        # 断言
-        try:
-            assert case['expected'] == result
-        except AssertionError as e:
-            log.error("用例执行失败")
-            log.exception(e)
-            raise e
-        else:
-            log.info("用例执行通过")
+        with allure.step("准备错误登录数据"):
+            allure.attach(str(case), "错误测试数据", allure.attachment_type.TEXT)
+        
+        with allure.step("执行错误登录操作"):
+            login_page, index_page = login_fixture
+            # 刷新页面
+            login_page.page_refresh()
+            # 执行登录操作
+            login_page.login(case['username'], case['password'])
+        
+        with allure.step("获取错误提示信息"):
+            # 获取实际提示结果
+            result = login_page.get_error_info()
+            allure.attach(result, "错误提示", allure.attachment_type.TEXT)
+        
+        with allure.step("验证错误提示"):
+            # 断言
+            try:
+                assert case['expected'] == result
+                allure.attach("错误提示正确", "断言结果", allure.attachment_type.TEXT)
+            except AssertionError as e:
+                log.error("用例执行失败")
+                log.exception(e)
+                allure.attach(str(e), "断言失败", allure.attachment_type.TEXT)
+                raise e
+            else:
+                log.info("用例执行通过")
+                allure.attach("测试通过", "测试结果", allure.attachment_type.TEXT)

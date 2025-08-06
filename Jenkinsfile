@@ -165,31 +165,18 @@ pipeline {
                         python3 -m pytest --version
                         
                         # 清理旧的测试结果
-                        rm -rf allure-results ALLURE-RESULTS allure-report
+                        rm -rf allure-results ALLURE-RESULTS allure-report allure_report
                         mkdir -p ALLURE-RESULTS
                         
-                        # 运行调试脚本
-                        echo "运行调试脚本..."
-                        chmod +x jenkins_debug.sh
-                        ./jenkins_debug.sh
+                        # 运行指定的测试文件
+                        echo "运行test_1_login.py..."
+                        python3 -m pytest testcase/test_1_login.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
                         
-                        # 强制运行我们的最小测试
-                        echo "强制运行test_minimal_allure.py..."
-                        python3 -m pytest testcase/test_minimal_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
-                        
-                        # 如果上面的测试不存在，运行简单测试
-                        if [ ! -f "testcase/test_minimal_allure.py" ]; then
-                            echo "test_minimal_allure.py不存在，运行test_simple_allure.py..."
-                            python3 -m pytest testcase/test_simple_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
-                        fi
-                        
-                        # 如果上面的测试都不存在，运行基础测试
-                        if [ ! -f "testcase/test_simple_allure.py" ]; then
-                            echo "test_simple_allure.py不存在，运行test_basic_allure.py..."
-                            python3 -m pytest testcase/test_basic_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
-                        fi
+
                         
                         echo "测试运行完成"
+                        
+
                         
                         # 检查生成的测试结果
                         echo "检查测试结果..."
@@ -252,11 +239,11 @@ pipeline {
                             sudo ln -s /opt/allure-2.24.1/bin/allure /usr/local/bin/allure
                             rm allure-2.24.1.tgz
                             
-                                                            # 重新生成报告
-                                if command -v allure &> /dev/null; then
-                                    echo "✅ Allure安装成功，重新生成报告"
-                                    allure generate ALLURE-RESULTS --clean -o allure-report
-                                fi
+                            # 重新生成报告
+                            if command -v allure &> /dev/null; then
+                                echo "✅ Allure安装成功，重新生成报告"
+                                allure generate ALLURE-RESULTS --clean -o allure-report
+                            fi
                         fi
                         
                         # 检查生成的报告
