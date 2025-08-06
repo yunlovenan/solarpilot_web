@@ -160,25 +160,25 @@ pipeline {
                         
                         # 清理旧的测试结果
                         rm -rf allure-results ALLURE-RESULTS allure-report
-                        mkdir -p allure-results
+                        mkdir -p ALLURE-RESULTS
                         
-                        # 直接运行基础测试
-                        python3 -m pytest testcase/test_basic_allure.py -v --alluredir=allure-results --junitxml=junit.xml --tb=short
+                        # 直接运行简单测试
+                        python3 -m pytest testcase/test_simple_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short
                         
                         echo "测试运行完成"
                         
                         # 检查生成的测试结果
                         echo "检查测试结果..."
-                        ls -la allure-results/ || echo "allure-results目录不存在"
-                        find allure-results -name "*.json" | head -5
+                        ls -la ALLURE-RESULTS/ || echo "ALLURE-RESULTS目录不存在"
+                        find ALLURE-RESULTS -name "*.json" | head -5
                         
                         # 显示测试结果统计
                         echo "测试结果统计:"
-                        find allure-results -name "*.json" | wc -l
+                        find ALLURE-RESULTS -name "*.json" | wc -l
                         
                         # 显示测试结果内容
                         echo "测试结果内容:"
-                        for file in allure-results/*.json; do
+                        for file in ALLURE-RESULTS/*.json; do
                             if [ -f "$file" ]; then
                                 echo "文件: $file"
                                 head -5 "$file"
@@ -202,12 +202,12 @@ pipeline {
                             echo "✅ Allure已安装: $(allure --version)"
                             
                             # 检查测试结果目录
-                            if [ -d "allure-results" ]; then
+                            if [ -d "ALLURE-RESULTS" ]; then
                                 echo "✅ 找到测试结果目录"
-                                ls -la allure-results/
+                                ls -la ALLURE-RESULTS/
                                 
                                 # 生成Allure报告
-                                allure generate allure-results --clean -o allure-report
+                                allure generate ALLURE-RESULTS --clean -o allure-report
                                 
                                 if [ $? -eq 0 ]; then
                                     echo "✅ Allure报告生成成功"
@@ -228,11 +228,11 @@ pipeline {
                             sudo ln -s /opt/allure-2.24.1/bin/allure /usr/local/bin/allure
                             rm allure-2.24.1.tgz
                             
-                            # 重新生成报告
-                            if command -v allure &> /dev/null; then
-                                echo "✅ Allure安装成功，重新生成报告"
-                                allure generate allure-results --clean -o allure-report
-                            fi
+                                                            # 重新生成报告
+                                if command -v allure &> /dev/null; then
+                                    echo "✅ Allure安装成功，重新生成报告"
+                                    allure generate ALLURE-RESULTS --clean -o allure-report
+                                fi
                         fi
                         
                         # 检查生成的报告
@@ -276,7 +276,7 @@ pipeline {
                         jdk: '',
                         properties: [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'allure-results']]
+                        results: [[path: 'ALLURE-RESULTS']]
                     ])
                 }
             }
