@@ -287,6 +287,37 @@ pipeline {
             }
         }
         
+        stage('Record Test Results') {
+            steps {
+                echo '📊 记录测试结果...'
+                script {
+                    // 记录JUnit测试结果
+                    junit 'junit.xml'
+                    
+                    // 显示测试结果统计
+                    sh '''
+                        echo "📋 测试结果统计:"
+                        if [ -f "junit.xml" ]; then
+                            echo "✅ junit.xml存在"
+                            echo "文件大小: $(du -h junit.xml | cut -f1)"
+                            echo "文件内容预览:"
+                            head -20 junit.xml
+                        else
+                            echo "❌ junit.xml不存在"
+                        fi
+                        
+                        echo "📊 Allure结果统计:"
+                        if [ -d "ALLURE-RESULTS" ]; then
+                            echo "✅ ALLURE-RESULTS目录存在"
+                            find ALLURE-RESULTS -name "*.json" | wc -l | xargs echo "JSON文件数量:"
+                        else
+                            echo "❌ ALLURE-RESULTS目录不存在"
+                        fi
+                    '''
+                }
+            }
+        }
+        
         stage('Allure Report') {
             steps {
                 echo '📊 生成Allure报告...'

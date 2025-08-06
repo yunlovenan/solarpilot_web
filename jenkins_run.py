@@ -66,11 +66,29 @@ def main():
     print("✅ 创建测试结果目录")
     
     # 运行测试
-    test_cmd = f"{activate_cmd} && python3 -m pytest testcase/test_1_login.py -v --alluredir=allure_report --junitxml=junit.xml --tb=short --no-cov"
+    test_cmd = f"{activate_cmd} && python3 -m pytest testcase/test_1_login.py -v --alluredir=allure_report --junitxml=junit.xml --tb=short --no-cov --verbose"
     if run_command(test_cmd, "运行测试"):
         print("✅ 测试运行成功")
     else:
         print("❌ 测试运行失败")
+        return 1
+    
+    # 检查JUnit XML文件
+    print("📋 检查JUnit XML文件...")
+    if os.path.exists('junit.xml'):
+        size = os.path.getsize('junit.xml')
+        print(f"✅ junit.xml存在，大小: {size} 字节")
+        
+        # 显示XML内容预览
+        try:
+            with open('junit.xml', 'r', encoding='utf-8') as f:
+                content = f.read()
+                print("📄 XML内容预览:")
+                print(content[:500] + "..." if len(content) > 500 else content)
+        except Exception as e:
+            print(f"❌ 读取XML文件失败: {e}")
+    else:
+        print("❌ junit.xml不存在")
         return 1
     
     # 检查测试结果
