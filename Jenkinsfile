@@ -168,6 +168,11 @@ pipeline {
                         rm -rf allure-results ALLURE-RESULTS allure-report
                         mkdir -p ALLURE-RESULTS
                         
+                        # 运行调试脚本
+                        echo "运行调试脚本..."
+                        chmod +x jenkins_debug.sh
+                        ./jenkins_debug.sh
+                        
                         # 强制运行我们的最小测试
                         echo "强制运行test_minimal_allure.py..."
                         python3 -m pytest testcase/test_minimal_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
