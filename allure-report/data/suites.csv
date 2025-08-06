@@ -1,4 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"设备添加","41681","正常添加","testcase","Tue Aug 05 17:03:41 CST 2025","broken","Tue Aug 05 17:04:23 CST 2025","TestDetector","test_3_device_add","",""
-"登录界面功能测试","0","登录失败场景","testcase","Tue Aug 05 17:03:39 CST 2025","skipped","Tue Aug 05 17:03:39 CST 2025","TestLogin","test_1_login","",""
-"登录界面功能测试","10566","登录成功场景","testcase","Tue Aug 05 17:03:28 CST 2025","passed","Tue Aug 05 17:03:39 CST 2025","TestLogin","test_1_login","",""
