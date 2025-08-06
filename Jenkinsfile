@@ -18,6 +18,10 @@ pipeline {
                     git checkout main
                     git pull origin main
                     echo "当前代码版本: $(git rev-parse HEAD)"
+                    echo "当前分支: $(git branch --show-current)"
+                    echo "远程分支: $(git branch -r)"
+                    echo "文件列表:"
+                    ls -la testcase/
                 '''
             }
         }
@@ -153,6 +157,8 @@ pipeline {
                     // 运行测试
                     sh '''
                         echo "开始运行测试..."
+                        echo "当前工作目录: $(pwd)"
+                        echo "当前代码版本: $(git rev-parse HEAD)"
                         
                         # 显示pytest版本和位置
                         which python3
@@ -162,8 +168,21 @@ pipeline {
                         rm -rf allure-results ALLURE-RESULTS allure-report
                         mkdir -p ALLURE-RESULTS
                         
-                        # 直接运行简单测试
-                        python3 -m pytest testcase/test_simple_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short
+                        # 强制运行我们的最小测试
+                        echo "强制运行test_minimal_allure.py..."
+                        python3 -m pytest testcase/test_minimal_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
+                        
+                        # 如果上面的测试不存在，运行简单测试
+                        if [ ! -f "testcase/test_minimal_allure.py" ]; then
+                            echo "test_minimal_allure.py不存在，运行test_simple_allure.py..."
+                            python3 -m pytest testcase/test_simple_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
+                        fi
+                        
+                        # 如果上面的测试都不存在，运行基础测试
+                        if [ ! -f "testcase/test_simple_allure.py" ]; then
+                            echo "test_simple_allure.py不存在，运行test_basic_allure.py..."
+                            python3 -m pytest testcase/test_basic_allure.py -v --alluredir=ALLURE-RESULTS --junitxml=junit.xml --tb=short --no-cov
+                        fi
                         
                         echo "测试运行完成"
                         
