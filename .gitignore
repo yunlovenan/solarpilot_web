@@ -56,3 +56,21 @@ Thumbs.db
 
 # 但保留小图标
 !*.ico 
+# Jenkins Agent相关文件
+jenkins_agent_*
+agent.jar
+
+# 测试结果
+ALLURE-RESULTS/
+junit.xml
+
+# 缓存文件
+__pycache__/
+*.pyc
+
+# 系统文件
+.DS_Store
+~/
+
+# 虚拟环境
+venv/

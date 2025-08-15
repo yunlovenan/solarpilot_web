@@ -1,0 +1,19 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<slave>
+  <name>appium-node</name>
+  <description>Appium移动测试节点，支持Android和iOS自动化测试</description>
+  <remoteFS>/appium/workspace</remoteFS>
+  <numExecutors>2</numExecutors>
+  <mode>NORMAL</mode>
+  <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+  <launcher class="hudson.slaves.JNLPLauncher">
+    <workDirSettings class="hudson.slaves.WorkDirSettings">
+      <disabled>false</disabled>
+      <internalDir>remoting</internalDir>
+      <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
+    </workDirSettings>
+  </launcher>
+  <label>appium mobile android ios</label>
+  <nodeProperties/>
+  <userId>appium</userId>
+</slave>

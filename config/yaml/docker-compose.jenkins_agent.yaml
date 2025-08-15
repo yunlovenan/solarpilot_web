@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Jenkins Master
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins_master
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - JENKINS_OPTS=--httpPort=8080
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - jenkins_network
+    restart: unless-stopped
+
+  # Jenkins Agent
+  jenkins_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins_agent
+    container_name: jenkins_agent_web
+    environment:
+      - JENKINS_URL=http://jenkins:8080
+      - JENKINS_SECRET=640c0dbc595cb998cbbd32530a9b756f057f8e544dfe15f6a56925e2836d9b68
+      - JENKINS_NAME=web
+      - JENKINS_WORKDIR=/jenkins
+    volumes:
+      - jenkins_agent_workspace:/jenkins
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - jenkins_network
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+    driver: local
+  jenkins_agent_workspace:
+    driver: local
+
+networks:
+  jenkins_network:
+    driver: bridge

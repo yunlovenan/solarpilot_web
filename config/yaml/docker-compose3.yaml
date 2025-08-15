@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Selenium Hub
+  hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    platform: linux/amd64  # 指定平台
+    ports:
+      - "4447:4442"
+      - "4448:4443"
+    environment:
+      - GRID_MAX_SESSION=16
+      - GRID_BROWSER_TIMEOUT=300
+      - GRID_TIMEOUT=300
+    restart: unless-stopped
+
+  # Chrome节点连接到Hub (使用官方ARM64兼容镜像)
+  chrome-node:
+    image: selenium/standalone-chrome:latest
+    container_name: chrome-node
+    platform: linux/amd64  # 使用amd64平台模拟
+    depends_on:
+      - hub
+    environment:
+      - SE_EVENT_BUS_HOST=hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_VNC=true
+      - SE_VNC_NO_PASSWORD=true
+    volumes:
+      - /dev/shm:/dev/shm
+    shm_size: 2gb
+    restart: unless-stopped
+
+  # Firefox节点连接到Hub (使用官方ARM64兼容镜像)
+  firefox-node:
+    image: selenium/standalone-firefox:latest
+    container_name: firefox-node
+    platform: linux/amd64  # 使用amd64平台模拟
+    depends_on:
+      - hub
+    environment:
+      - SE_EVENT_BUS_HOST=hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_VNC=true
+      - SE_VNC_NO_PASSWORD=true
+    volumes:
+      - /dev/shm:/dev/shm
+    shm_size: 2gb
+    restart: unless-stopped

@@ -4,12 +4,12 @@ from selenium.webdriver.common.by import By
 
 class LoginLocator:
     """登录页面的元素定位"""
-    # 账号输入框
-    username_loc = (By.CSS_SELECTOR, 'input[type="text"]')
-    # 密码输入框
-    pwd_loc = (By.CSS_SELECTOR, 'input[type="password"]')
-    # 服务条款复选框
-    service_loc = (By.CSS_SELECTOR, 'input[type="checkbox"]')
+    # 账号输入框 - 使用更精确的选择器
+    username_loc = (By.ID, 'loginNo')
+    # 密码输入框 - 使用更精确的选择器
+    pwd_loc = (By.ID, 'password')
+    # 服务条款复选框 - 使用更精确的选择器
+    service_loc = (By.ID, 'agreement')
     # 点击按钮
     login_loc = (By.XPATH, "//span[text()='登 录']")
     # 失败的提示内容

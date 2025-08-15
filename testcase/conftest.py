@@ -8,6 +8,7 @@ import pytest
 
 from common.handle_config import conf
 from common.handle_logging import log
+from common.local_browser import local_chrome_manager
 from page.page_index import IndexPage
 from page.page_login import LoginPage
 from page.page_antena import AntenaPage
@@ -110,11 +111,12 @@ def get_standard_data_fixture():
 #设置为session，全部用例执行一次
 @pytest.fixture(scope='session')
 def driver():
-    """Web测试 - 使用Chrome driver"""
+    """Web测试 - 使用远程Chrome driver连接到Selenium Grid"""
     import os
     import time
     import sys
     from selenium import webdriver
+    from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
     
     # 检测当前运行的测试文件
     current_test_file = None
@@ -133,152 +135,20 @@ def driver():
                 break
             frame = frame.f_back
     
-    print(f'------------open browser------------')
+    print(f'------------open remote browser------------')
     print(f'当前测试文件: {current_test_file}')
     
-    chromeOptions = webdriver.ChromeOptions()
-    
     # 检查是否在Jenkins环境中运行
     is_jenkins = os.environ.get('JENKINS_URL') is not None or os.environ.get('BUILD_NUMBER') is not None
-    is_headless = conf.getboolean('env', 'headless') or is_jenkins
     
-    if is_headless:
-        print("🔧 使用无头模式运行")
-        chromeOptions.add_argument('--headless')
-        chromeOptions.add_argument('--no-sandbox')
-        chromeOptions.add_argument('--disable-dev-shm-usage')
-        chromeOptions.add_argument('--disable-gpu')
-        chromeOptions.add_argument('--window-size=1920,1080')
-    else:
-        print("🖥️ 使用有界面模式运行")
-    
-    # 设定下载文件的保存目录
-    prefs = {"download.default_directory": "/tmp/testDownload"}
-    chromeOptions.add_experimental_option("prefs", prefs)
-    chromeOptions.add_argument("--ignore-certificate-errors")
-    chromeOptions.add_argument('--unlimited-storage')
-    # 添加代理绕过选项
-    chromeOptions.add_argument('--no-proxy-server')
-    chromeOptions.add_argument('--proxy-bypass-list=*')
-    chromeOptions.add_argument('--disable-web-security')
-    chromeOptions.add_argument('--allow-running-insecure-content')
-    
-    # 检查是否在Jenkins环境中运行
-    is_jenkins = os.environ.get('JENKINS_URL') is not None or os.environ.get('BUILD_NUMBER') is not None
-    is_headless = conf.getboolean('env', 'headless') or is_jenkins
-    
-    if is_headless:
-        print("🔧 使用无头模式运行")
-        chromeOptions.add_argument('--headless')
-        chromeOptions.add_argument('--no-sandbox')
-        chromeOptions.add_argument('--disable-dev-shm-usage')
-        chromeOptions.add_argument('--disable-gpu')
-        chromeOptions.add_argument('--window-size=1920,1080')
-    else:
-        print("🖥️ 使用有界面模式运行")
-    
-    # 智能ChromeDriver管理
-    def setup_chromedriver():
-        """设置ChromeDriver"""
-        import subprocess
-        import platform
-        
-        # 检查是否在ARM64架构上
-        if platform.machine() == 'aarch64':
-            print("🔧 检测到ARM64架构，使用手动ChromeDriver安装")
-            
-            # 检查ChromeDriver是否已安装
-            if not subprocess.run(['which', 'chromedriver'], capture_output=True).returncode == 0:
-                print("📦 安装ChromeDriver...")
-                
-                # 检测Chrome版本
-                try:
-                    result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
-                    if result.returncode == 0:
-                        version_line = result.stdout.strip()
-                        chrome_version = version_line.split()[-1]
-                        major_version = chrome_version.split('.')[0]
-                        print(f"检测到Chrome版本: {chrome_version}")
-                        
-                        # 下载ARM64版本的ChromeDriver
-                        download_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}"
-                        version_result = subprocess.run(['curl', '-s', download_url], capture_output=True, text=True)
-                        
-                        if version_result.returncode == 0:
-                            chromedriver_version = version_result.stdout.strip()
-                            print(f"下载ChromeDriver版本: {chromedriver_version}")
-                            
-                            # 下载ARM64版本的ChromeDriver
-                            download_cmd = [
-                                'wget', '-O', '/tmp/chromedriver.zip',
-                                f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_linux64.zip'
-                            ]
-                            subprocess.run(download_cmd, check=True)
-                            
-                            # 解压并安装
-                            subprocess.run(['sudo', 'unzip', '/tmp/chromedriver.zip', '-d', '/usr/local/bin/'], check=True)
-                            subprocess.run(['sudo', 'chmod', '+x', '/usr/local/bin/chromedriver'], check=True)
-                            subprocess.run(['rm', '/tmp/chromedriver.zip'], check=True)
-                            
-                            print("✅ ChromeDriver安装完成")
-                            return "/usr/local/bin/chromedriver"
-                        else:
-                            print("❌ 无法获取ChromeDriver版本")
-                    else:
-                        print("❌ 无法检测Chrome版本")
-                except Exception as e:
-                    print(f"❌ ChromeDriver安装失败: {e}")
-            
-            # 检查ChromeDriver是否可用
-            if subprocess.run(['which', 'chromedriver'], capture_output=True).returncode == 0:
-                chromedriver_path = subprocess.run(['which', 'chromedriver'], capture_output=True, text=True).stdout.strip()
-                print(f"✅ 找到ChromeDriver: {chromedriver_path}")
-                return chromedriver_path
-        
-        return None
-    
-    # 尝试设置ChromeDriver
-    chrome_driver_path = setup_chromedriver()
-    
-    # 尝试启动Chrome
-    driver = None
+    # 直接使用本地Chrome浏览器
+    print("🚀 正在启动本地Chrome浏览器...")
     try:
-        if chrome_driver_path:
-            print(f"🚀 使用ChromeDriver: {chrome_driver_path}")
-            driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
-        else:
-            print("🚀 尝试使用Selenium Manager自动管理ChromeDriver")
-            driver = webdriver.Chrome(options=chromeOptions)
-        
-        driver.maximize_window()
-        # chrome由于每次都打开设置页面，暂时没有找到关闭的方法，需要切换操作窗口(火狐浏览器不需要切换窗口)
-        windows = driver.window_handles  # 获取所有窗口
-        driver.switch_to.window(windows[-1])  # 切换到最新窗口
-        print("✅ Chrome浏览器启动成功")
-        
+        driver = local_chrome_manager.create_local_driver()
+        print("✅ 本地Chrome浏览器启动成功")
     except Exception as e:
-        print(f"❌ Chrome启动失败: {e}")
-        print("🔄 尝试使用备用配置...")
-        
-        # 添加更多无头模式选项
-        chromeOptions.add_argument('--headless')
-        chromeOptions.add_argument('--no-sandbox')
-        chromeOptions.add_argument('--disable-dev-shm-usage')
-        chromeOptions.add_argument('--disable-gpu')
-        chromeOptions.add_argument('--window-size=1920,1080')
-        chromeOptions.add_argument('--disable-extensions')
-        chromeOptions.add_argument('--disable-plugins')
-        chromeOptions.add_argument('--disable-images')
-        
-        try:
-            if chrome_driver_path:
-                driver = webdriver.Chrome(service=webdriver.chrome.service.Service(chrome_driver_path), options=chromeOptions)
-            else:
-                driver = webdriver.Chrome(options=chromeOptions)
-            print("✅ 无头模式Chrome启动成功")
-        except Exception as e2:
-            print(f"❌ 无头模式也启动失败: {e2}")
-            raise e2
+        print(f"❌ 本地Chrome启动失败: {e}")
+        raise e
 
     # 总是尝试使用cookies登录（除了明确指定不使用cookies的情况）
     print("尝试使用cookies登录...")
@@ -290,8 +160,49 @@ def driver():
             print("发现 cookies 文件，正在加载...")
             
             # 先访问主域名，确保cookies能正确设置
-            driver.get("https://solar-tst.eiot6.com")
-            time.sleep(3)
+            print("正在访问目标应用页面...")
+            try:
+                driver.get("https://solar-tst.eiot6.com")
+                print("等待页面完全加载...")
+                time.sleep(10)  # 给更多时间加载
+                
+                # 等待页面完全加载
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                from selenium.webdriver.common.by import By
+                
+                try:
+                    # 等待页面标题出现
+                    WebDriverWait(driver, 20).until(
+                        EC.presence_of_element_located((By.TAG_NAME, "title"))
+                    )
+                    print("页面标题元素已加载")
+                    
+                    # 检查页面是否正常加载
+                    current_url = driver.current_url
+                    print(f"页面加载完成，当前URL: {current_url}")
+                    
+                    # 检查页面标题
+                    try:
+                        page_title = driver.title
+                        print(f"页面标题: {page_title}")
+                        
+                        # 检查页面内容
+                        page_source_length = len(driver.page_source)
+                        print(f"页面源码长度: {page_source_length}")
+                        
+                    except Exception as e:
+                        print(f"无法获取页面信息: {e}")
+                        
+                except Exception as e:
+                    print(f"页面加载超时: {e}")
+                
+            except Exception as e:
+                print(f"页面访问失败: {e}")
+                # 如果页面访问失败，尝试访问一个简单的页面
+                print("尝试访问简单页面...")
+                driver.get("https://www.baidu.com")
+                time.sleep(3)
             
             with open(cookies_file, 'r', encoding='utf-8') as f:
                 cookies = json.load(f)
@@ -330,25 +241,38 @@ def driver():
                     try:
                         driver.add_cookie(cookie_copy2)
                         print(f"✅ 方法3成功添加cookie {i+1}: {cookie_copy2.get('name', 'unknown')} (无domain)")
-                    except Exception as e3:
-                        print(f"❌ 方法3失败: {e3}")
+                    except Exception as e2:
+                        print(f"❌ 方法3失败: {e2}")
                         
                 except Exception as e:
                     print(f"❌ 处理cookie {i+1} 时出错: {e}")
             
             # 刷新页面并等待
             print("刷新页面...")
-            driver.refresh()
-            time.sleep(5)
-            
-            # 检查是否成功登录
-            current_url = driver.current_url
-            print(f"当前页面URL: {current_url}")
-            
-            if 'login' not in current_url:
-                print("✅ Cookies 加载完成，已绕过登录")
-            else:
-                print("⚠️ Cookies 可能无效，需要手动登录")
+            try:
+                driver.refresh()
+                time.sleep(5)
+                
+                # 检查是否成功登录
+                current_url = driver.current_url
+                print(f"当前页面URL: {current_url}")
+                
+                if 'login' not in current_url:
+                    print("✅ Cookies 加载完成，已绕过登录")
+                else:
+                    print("⚠️ Cookies 可能无效，需要手动登录")
+                    
+            except Exception as e:
+                print(f"页面刷新失败: {e}")
+                print("尝试重新访问页面...")
+                try:
+                    driver.get("https://solar-tst.eiot6.com")
+                    time.sleep(5)
+                except Exception as e2:
+                    print(f"重新访问也失败: {e2}")
+                    # 最后尝试访问百度
+                    driver.get("https://www.baidu.com")
+                    time.sleep(3)
         else:
             print("未找到 cookies 文件，需要手动登录")
     except Exception as e:
@@ -356,6 +280,7 @@ def driver():
     
     yield driver
     print('------------测试完成，保持浏览器打开------------')
+    print("📺 您可以通过 http://localhost:7900 继续查看浏览器状态")
     # 调试模式下不关闭浏览器，让用户可以看到结果
     # driver.quit()
 

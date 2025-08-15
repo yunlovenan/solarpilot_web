@@ -30,9 +30,9 @@ def login_fixture(driver):
     # 前置条件
     log.info("开始执行登录的用例")
     
-    # 清除所有cookies，确保是全新登录
-    print("清除所有cookies，准备进行登录测试...")
-    driver.delete_all_cookies()
+    # # 清除所有cookies，确保是全新登录
+    # print("清除所有cookies，准备进行登录测试...")
+    # driver.delete_all_cookies()
     
     # 跳转到登录页面
     driver.get("https://solar-tst.eiot6.com/account/login")
@@ -80,8 +80,45 @@ class TestLogin:
         
         with allure.step("执行登录操作"):
             login_page, index_page = login_fixture
-            # 进行登录的操作
-            login_page.login(case['username'], case['password'])
+            
+            # 强制访问登录页面，确保在正确的页面上
+            driver = login_page.driver
+            current_url = driver.current_url
+            print(f"当前页面URL: {current_url}")
+            
+            # 检查是否在真正的登录页面
+            if not current_url.startswith('https://solar-tst.eiot6.com/account/login'):
+                print(f"当前页面不是登录页面，强制跳转到登录页面...")
+                print(f"当前URL: {current_url}")
+                
+                # 清除cookies，防止自动重定向
+                print("清除cookies，防止自动重定向...")
+                driver.delete_all_cookies()
+                
+                # 访问登录页面
+                driver.get("https://solar-tst.eiot6.com/account/login")
+                time.sleep(5)  # 等待页面完全加载
+                
+                # 再次检查是否成功跳转
+                current_url = driver.current_url
+                print(f"跳转后的URL: {current_url}")
+                
+                # 如果还是不在登录页面，再次尝试
+                if not current_url.startswith('https://solar-tst.eiot6.com/account/login'):
+                    print(f"⚠️ 跳转失败，再次尝试...")
+                    driver.get("https://solar-tst.eiot6.com/account/login")
+                    time.sleep(5)
+                    current_url = driver.current_url
+                    print(f"第二次尝试后的URL: {current_url}")
+            
+            # 确保在登录页面
+            if current_url.startswith('https://solar-tst.eiot6.com/account/login'):
+                print("✅ 成功进入登录页面，开始执行登录操作")
+                # 进行登录的操作
+                login_page.login(case['username'], case['password'])
+            else:
+                print(f"❌ 无法进入登录页面，当前URL: {current_url}")
+                raise Exception(f"无法进入登录页面，当前URL: {current_url}")
         
         with allure.step("获取登录结果"):
             # 获取登录之后的用户信息
