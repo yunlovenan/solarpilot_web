@@ -19,16 +19,10 @@ pipeline {
             steps {
                 echo "🚀 开始设置测试环境..."
                 
-                // 检查系统环境
+                // 使用优化的设置脚本
                 sh '''
-                    echo "=== 系统信息 ==="
-                    uname -a
-                    echo "=== Python版本 ==="
-                    python3 --version
-                    echo "=== Chrome版本 ==="
-                    google-chrome --version || echo "Chrome未安装"
-                    echo "=== ChromeDriver版本 ==="
-                    chromedriver --version || echo "ChromeDriver未安装"
+                    chmod +x config/scripts/jenkins_linux_setup.sh
+                    ./config/scripts/jenkins_linux_setup.sh
                 '''
             }
         }
