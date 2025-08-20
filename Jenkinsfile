@@ -11,96 +11,56 @@ pipeline {
             steps {
                 echo '📥 检出代码...'
                 script {
-                    // 设置超时时间
-                    timeout(time: 10, unit: 'MINUTES') {
-                        // 首先尝试使用Jenkins的Git插件（现在有凭证了）
-                        try {
-                            echo "尝试使用Jenkins Git插件检出代码..."
-                            checkout([
-                                $class: 'GitSCM',
-                                branches: [[name: "*/main"]],
-                                doGenerateSubmoduleConfigurations: false,
-                                extensions: [
-                                    [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true],
-                                    [$class: 'CleanBeforeCheckout'],
-                                    [$class: 'CleanCheckout']
-                                ],
-                                submoduleCfg: [],
-                                userRemoteConfigs: [[
-                                    credentialsId: 'github-credentials',
-                                    url: 'https://github.com/yunlovenan/solarpilot_web.git'
-                                ]]
-                            ])
-                            echo "✅ Jenkins Git插件检出成功"
-                        } catch (Exception e) {
-                            echo "❌ Jenkins Git插件检出失败: ${e.getMessage()}"
-                            echo "尝试使用shell命令备用方案..."
-                            
-                            // 备用方案：使用shell命令
-                            sh '''
-                                echo "开始备用方案检出代码..."
-                                pwd
-                                ls -la
-                                
-                                # 配置Git网络参数
-                                git config --global http.postBuffer 524288000
-                                git config --global http.lowSpeedLimit 0
-                                git config --global http.lowSpeedTime 999999
-                                git config --global http.timeout 300
-                                git config --global core.compression 0
-                                
-                                # 清理并克隆
-                                rm -rf * .git
-                                
-                                # 尝试多种克隆方式，带重试
-                                echo "尝试浅克隆方式..."
-                                for i in {1..3}; do
-                                    echo "第 $i 次尝试浅克隆..."
-                                    if timeout 300 git clone --depth 1 --single-branch --branch main --progress https://github.com/yunlovenan/solarpilot_web.git .; then
-                                        echo "浅克隆成功"
-                                        break
-                                    else
-                                        echo "浅克隆失败，清理重试..."
-                                        rm -rf * .git
-                                        sleep 10
-                                    fi
-                                done
-                                
-                                # 如果浅克隆失败，尝试更浅的克隆
-                                if [ ! -d ".git" ]; then
-                                    echo "尝试极浅克隆..."
-                                    timeout 300 git clone --depth 1 --single-branch --branch main --no-tags --progress https://github.com/yunlovenan/solarpilot_web.git .
-                                fi
-                                
-                                # 确保克隆成功
-                                if [ ! -d ".git" ]; then
-                                    echo "❌ 所有克隆方式都失败了"
-                                    exit 1
-                                fi
-                                
-                                echo "✅ 备用方案检出成功"
-                            '''
-                        }
+                    // 完全绕过Jenkins Git插件，直接使用shell命令
+                    sh '''
+                        echo "开始检出代码..."
+                        pwd
+                        ls -la
                         
-                        // 验证检出结果
-                        sh '''
-                            echo "验证代码检出结果..."
-                            pwd
-                            ls -la
+                        # 配置Git网络参数，优化传输
+                        git config --global http.postBuffer 1048576000
+                        git config --global http.lowSpeedLimit 0
+                        git config --global http.lowSpeedTime 999999
+                        git config --global http.timeout 600
+                        git config --global core.compression 0
+                        git config --global http.version HTTP/1.1
+                        
+                        # 清理工作目录
+                        rm -rf * .git
+                        
+                        # 使用浅克隆，只下载最新版本
+                        echo "使用浅克隆方式..."
+                        if timeout 600 git clone --depth 1 --single-branch --branch main --no-tags --progress https://github.com/yunlovenan/solarpilot_web.git .; then
+                            echo "✅ 浅克隆成功"
+                        else
+                            echo "浅克隆失败，尝试更浅的克隆..."
+                            rm -rf * .git
                             
-                            if [ -d ".git" ]; then
-                                echo "✅ Git仓库检出成功"
-                                echo "当前代码版本: $(git rev-parse HEAD)"
-                                echo "当前分支: $(git branch --show-current)"
-                                echo "远程分支: $(git branch -r)"
+                            # 尝试极浅克隆，只下载一个提交
+                            if timeout 600 git clone --depth 1 --single-branch --branch main --no-tags --no-checkout --progress https://github.com/yunlovenan/solarpilot_web.git .; then
+                                echo "极浅克隆成功，现在检出文件..."
+                                git checkout HEAD
+                                echo "✅ 文件检出成功"
                             else
-                                echo "❌ Git仓库检出失败"
+                                echo "❌ 所有克隆方式都失败了"
                                 exit 1
                             fi
-                            
-                            echo "代码检出完成"
-                        '''
-                    }
+                        fi
+                        
+                        # 验证克隆结果
+                        if [ -d ".git" ]; then
+                            echo "✅ Git仓库检出成功"
+                            echo "当前代码版本: $(git rev-parse HEAD)"
+                            echo "当前分支: $(git branch --show-current)"
+                            echo "文件数量: $(find . -type f | wc -l)"
+                        else
+                            echo "❌ Git仓库检出失败"
+                            exit 1
+                        fi
+                        
+                        echo "代码检出完成"
+                        ls -la
+                    '''
                 }
             }
         }
