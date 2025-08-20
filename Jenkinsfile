@@ -10,10 +10,16 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo '📥 检出代码...'
-                checkout scm
-                
-                // 确保使用最新代码
+                // 替换 checkout scm 为具体的Git操作
                 sh '''
+                    # 清理工作目录
+                    rm -rf *
+                    rm -rf .git
+                    
+                    # 克隆代码仓库（需要配置Git凭证）
+                    git clone https://github.com/yunlovenan/solarpilot_web.git .
+                    
+                    # 确保使用最新代码
                     git fetch origin
                     git checkout main
                     git pull origin main
