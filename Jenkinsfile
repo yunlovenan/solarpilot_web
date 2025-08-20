@@ -1,34 +1,53 @@
 pipeline {
     agent any
     
+    tools {
+        allure 'allure'
+        git 'Default'
+    }
+    
     environment {
         PYTHON_VERSION = '3.11'
-        PROJECT_NAME = 'solar_web'
+        PROJECT_NAME = 'solarpilot_web'
+        GIT_URL = 'https://github.com/yunlovenan/solarpilot_web.git'
+        GIT_BRANCH = 'main'
     }
     
     stages {
         stage('Checkout') {
             steps {
                 echo '📥 检出代码...'
-                // 替换 checkout scm 为具体的Git操作
-                sh '''
-                    # 清理工作目录
-                    rm -rf *
-                    rm -rf .git
+                script {
+                    // 使用更稳定的Git配置
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${env.GIT_BRANCH}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [
+                            [$class: 'CleanBeforeCheckout'],
+                            [$class: 'CleanCheckout'],
+                            [$class: 'SubmoduleOption', disableSubmodules: false, recursiveSubmodules: true, trackingSubmodules: false],
+                            [$class: 'GitLFSPull', fetchCount: 0]
+                        ],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'github-credentials',
+                            url: env.GIT_URL,
+                            refspec: "+refs/heads/${env.GIT_BRANCH}:refs/remotes/origin/${env.GIT_BRANCH}"
+                        ]]
+                    ])
                     
-                    # 克隆代码仓库（需要配置Git凭证）
-                    git clone https://github.com/yunlovenan/solarpilot_web.git .
-                    
-                    # 确保使用最新代码
-                    git fetch origin
-                    git checkout main
-                    git pull origin main
-                    echo "当前代码版本: $(git rev-parse HEAD)"
-                    echo "当前分支: $(git branch --show-current)"
-                    echo "远程分支: $(git branch -r)"
-                    echo "文件列表:"
-                    ls -la testcase/
-                '''
+                    // 显示Git信息
+                    sh '''
+                        echo "✅ 代码检出成功"
+                        echo "当前工作目录: $(pwd)"
+                        echo "当前代码版本: $(git rev-parse HEAD)"
+                        echo "当前分支: $(git branch --show-current)"
+                        echo "远程分支: $(git branch -r)"
+                        echo "文件列表:"
+                        ls -la
+                    '''
+                }
             }
         }
         
@@ -186,11 +205,7 @@ pipeline {
                             echo "✅ 测试结果已复制到ALLURE-RESULTS"
                         fi
                         
-
-                        
                         echo "测试运行完成"
-                        
-
                         
                         # 检查生成的测试结果
                         echo "检查测试结果..."
@@ -375,4 +390,4 @@ pipeline {
             echo '⚠️ 测试不稳定'
         }
     }
-} 
+}
