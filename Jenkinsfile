@@ -18,24 +18,37 @@ pipeline {
             steps {
                 echo '📥 检出代码...'
                 script {
-                    // 使用更稳定的Git配置
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${env.GIT_BRANCH}"]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [
-                            [$class: 'CleanBeforeCheckout'],
-                            [$class: 'CleanCheckout'],
-                            [$class: 'SubmoduleOption', disableSubmodules: false, recursiveSubmodules: true, trackingSubmodules: false],
-                            [$class: 'GitLFSPull', fetchCount: 0]
-                        ],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[
-                            credentialsId: 'github-credentials',
-                            url: env.GIT_URL,
-                            refspec: "+refs/heads/${env.GIT_BRANCH}:refs/remotes/origin/${env.GIT_BRANCH}"
-                        ]]
-                    ])
+                    try {
+                        // 尝试使用Git SCM插件
+                        echo "尝试使用Git SCM插件检出代码..."
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: "*/${env.GIT_BRANCH}"]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [],
+                            submoduleCfg: [],
+                            userRemoteConfigs: [[
+                                url: env.GIT_URL
+                            ]]
+                        ])
+                    } catch (Exception e) {
+                        echo "Git SCM插件检出失败，尝试使用shell命令..."
+                        // 备用方案：使用shell命令
+                        sh '''
+                            # 清理工作目录
+                            rm -rf *
+                            rm -rf .git
+                            
+                            # 克隆代码仓库
+                            echo "使用git clone命令..."
+                            git clone ${GIT_URL} .
+                            
+                            # 切换到指定分支
+                            git checkout ${GIT_BRANCH}
+                            
+                            echo "✅ 代码检出完成"
+                        '''
+                    }
                     
                     // 显示Git信息
                     sh '''
