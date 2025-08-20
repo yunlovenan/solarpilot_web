@@ -15,9 +15,41 @@ pipeline {
                     pwd
                     ls -la
                     
+                    # 配置Git网络参数
+                    git config --global http.postBuffer 524288000
+                    git config --global http.lowSpeedLimit 0
+                    git config --global http.lowSpeedTime 999999
+                    git config --global http.timeout 300
+                    
                     # 清理并克隆
                     rm -rf * .git
-                    git clone https://github.com/yunlovenan/solarpilot_web.git .
+                    
+                    # 尝试多种克隆方式，带重试
+                    echo "尝试HTTPS方式克隆..."
+                    for i in {1..3}; do
+                        echo "第 $i 次尝试HTTPS克隆..."
+                        if git clone --progress https://github.com/yunlovenan/solarpilot_web.git .; then
+                            echo "HTTPS克隆成功"
+                            break
+                        else
+                            echo "HTTPS克隆失败，清理重试..."
+                            rm -rf * .git
+                            sleep 5
+                        fi
+                    done
+                    
+                    # 如果HTTPS失败，尝试浅克隆
+                    if [ ! -d ".git" ]; then
+                        echo "尝试浅克隆..."
+                        git clone --depth 1 --progress https://github.com/yunlovenan/solarpilot_web.git .
+                    fi
+                    
+                    # 确保克隆成功
+                    if [ ! -d ".git" ]; then
+                        echo "❌ 所有克隆方式都失败了"
+                        exit 1
+                    fi
+                    
                     git checkout main
                     
                     echo "代码检出完成"
