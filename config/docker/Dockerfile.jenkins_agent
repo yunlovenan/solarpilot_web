@@ -1,0 +1,40 @@
+FROM eclipse-temurin:8u462-b08-jre-ubi9-minimal
+
+# 设置工作目录
+WORKDIR /app
+
+# 更新包管理器并安装Python3和必要的工具
+RUN dnf update -y && \
+    dnf install -y python3 python3-pip curl wget unzip && \
+    dnf clean all
+
+# 创建Jenkins工作目录并设置权限
+RUN mkdir -p /jenkins && chmod 755 /jenkins
+
+# 下载Jenkins agent.jar
+RUN curl -sO https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/hudson/remoting/agent.jar
+
+# 验证agent.jar下载
+RUN ls -la agent.jar && \
+    echo "Agent.jar size: $(stat -c%s agent.jar) bytes"
+
+# 设置环境变量
+ENV JENKINS_URL=http://jenkins:8080
+ENV JENKINS_SECRET=640c0dbc595cb998cbbd32530a9b756f057f8e544dfe15f6a56925e2836d9b68
+ENV JENKINS_NAME=web
+ENV JENKINS_WORKDIR=/jenkins
+
+# 创建启动脚本
+RUN echo '#!/bin/bash' > /app/start-agent.sh && \
+    echo 'echo "Starting Jenkins agent..."' >> /app/start-agent.sh && \
+    echo 'echo "Jenkins URL: $JENKINS_URL"' >> /app/start-agent.sh && \
+    echo 'echo "Agent Name: $JENKINS_NAME"' >> /app/start-agent.sh && \
+    echo 'echo "Work Directory: $JENKINS_WORKDIR"' >> /app/start-agent.sh && \
+    echo 'java -jar agent.jar -url $JENKINS_URL -secret $JENKINS_SECRET -name $JENKINS_NAME -webSocket -workDir $JENKINS_WORKDIR' >> /app/start-agent.sh && \
+    chmod +x /app/start-agent.sh
+
+# 暴露端口（如果需要）
+EXPOSE 50000
+
+# 使用启动脚本
+CMD ["/app/start-agent.sh"]

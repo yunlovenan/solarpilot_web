@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual envs
+.venv/
+venv/
+
+# Test & reports
+.pytest_cache/
+ALLURE-RESULTS/
+allure_report/
+junit.xml
+result/logs/
+
+# OS files
+.DS_Store

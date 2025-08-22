@@ -1,0 +1,132 @@
+pipeline {
+    agent any
+    
+    environment {
+        // 设置Jenkins环境变量，确保被检测到
+        JENKINS_URL = "${env.JENKINS_URL}"
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+        BUILD_ID = "${env.BUILD_ID}"
+        WORKSPACE = "${env.WORKSPACE}"
+        JOB_NAME = "${env.JOB_NAME}"
+        
+        // Python环境
+        PYTHON_VERSION = "3.13"
+        VENV_PATH = "${env.WORKSPACE}/venv"
+    }
+    
+    stages {
+        stage('Setup Environment') {
+            steps {
+                echo "🚀 开始设置测试环境..."
+                
+                // 使用优化的设置脚本
+                sh '''
+                    chmod +x config/scripts/jenkins_linux_setup.sh
+                    ./config/scripts/jenkins_linux_setup.sh
+                '''
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                echo "📦 安装Python依赖..."
+                
+                sh '''
+                    # 创建虚拟环境
+                    python3 -m venv ${VENV_PATH}
+                    source ${VENV_PATH}/bin/activate
+                    
+                    # 升级pip
+                    pip install --upgrade pip
+                    
+                    # 安装项目依赖
+                    pip install -r requirements.txt
+                    
+                    # 安装Chrome和ChromeDriver（如果需要）
+                    # 这里假设系统已经安装了Chrome和ChromeDriver
+                '''
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                echo "🧪 开始执行测试..."
+                
+                sh '''
+                    # 激活虚拟环境
+                    source ${VENV_PATH}/bin/activate
+                    
+                    # 设置环境变量
+                    export JENKINS_URL=${JENKINS_URL}
+                    export BUILD_NUMBER=${BUILD_NUMBER}
+                    export BUILD_ID=${BUILD_ID}
+                    export WORKSPACE=${WORKSPACE}
+                    export JOB_NAME=${JOB_NAME}
+                    
+                    echo "=== 环境变量 ==="
+                    env | grep -E "(JENKINS|BUILD|WORKSPACE|JOB)"
+                    
+                    echo "=== 开始执行测试 ==="
+                    # 运行登录测试
+                    python3 -m pytest testcase/test_1_login.py::TestLogin::test_login_pass -v --junitxml=test-results.xml
+                    
+                    # 运行所有测试
+                    # python3 -m pytest testcase/ -v --junitxml=test-results.xml
+                '''
+            }
+            
+            post {
+                always {
+                    // 收集测试结果
+                    junit 'test-results.xml'
+                    
+                    // 收集测试报告
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'test_reports',
+                        reportFiles: 'index.html',
+                        reportName: 'Test Report'
+                    ])
+                }
+            }
+        }
+        
+        stage('Generate Allure Report') {
+            when {
+                expression { return fileExists('ALLURE-RESULTS') }
+            }
+            steps {
+                echo "📊 生成Allure测试报告..."
+                
+                sh '''
+                    source ${VENV_PATH}/bin/activate
+                    
+                    # 生成Allure报告
+                    allure generate ALLURE-RESULTS --clean -o allure-report
+                    
+                    # 归档报告
+                    archiveArtifacts artifacts: allure-report/, fingerprint: true
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "🏁 测试执行完成"
+            
+            // 清理工作空间
+            cleanWs()
+        }
+        
+        success {
+            echo "✅ 所有测试通过！"
+        }
+        
+        failure {
+            echo "❌ 测试执行失败"
+        }
+    }
+}
