@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from common.handle_logging import log
+import shutil
 
 class LocalChromeManager:
     """本地Chrome浏览器管理器"""
@@ -26,29 +27,82 @@ class LocalChromeManager:
             log.info("🏠 检测到本地环境，将使用有头模式")
     
     def _detect_platform_paths(self):
-        """检测当前平台的Chrome和ChromeDriver路径"""
+        """检测当前平台的Chrome和ChromeDriver路径。
+        优先级：环境变量 > 常见路径 > PATH 可执行文件。
+        支持 Linux 上的 chromium/chromium-browser，以及 macOS 的 Google Chrome。
+        """
         import platform
-        
+
+        def first_existing(candidates):
+            for path in candidates:
+                if path and os.path.exists(path):
+                    return path
+                # 支持可执行名，通过 PATH 解析
+                if path and os.path.sep not in path:
+                    found = shutil.which(path)
+                    if found:
+                        return found
+            return None
+
         system = platform.system().lower()
-        
+
+        # 允许通过环境变量覆盖
+        env_chrome = os.environ.get("CHROME_BIN") or os.environ.get("SE_CHROME_BINARY")
+        env_chromedriver = os.environ.get("CHROMEDRIVER_PATH") or os.environ.get("WEBDRIVER_CHROME_DRIVER")
+
         if system == "darwin":  # macOS
-            chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            chromedriver_path = "/opt/homebrew/bin/chromedriver"
+            chrome_candidates = [
+                env_chrome,
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                "google-chrome",
+                "chrome",
+            ]
+            driver_candidates = [
+                env_chromedriver,
+                "/opt/homebrew/bin/chromedriver",
+                "/usr/local/bin/chromedriver",
+                "chromedriver",
+            ]
         elif system == "linux":  # Linux
-            chrome_path = "/usr/bin/google-chrome"  # 标准Linux Chrome路径
-            chromedriver_path = "/usr/bin/chromedriver"  # 标准Linux ChromeDriver路径
+            chrome_candidates = [
+                env_chrome,
+                "/usr/bin/google-chrome",
+                "/usr/bin/chromium",
+                "/usr/bin/chromium-browser",
+                "/snap/bin/chromium",
+                "google-chrome",
+                "chromium",
+                "chromium-browser",
+            ]
+            driver_candidates = [
+                env_chromedriver,
+                "/usr/bin/chromedriver",
+                "/usr/lib/chromium/chromedriver",
+                "/snap/bin/chromium.chromedriver",
+                "chromedriver",
+            ]
         elif system == "windows":  # Windows
-            chrome_path = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-            chromedriver_path = "C:\\chromedriver.exe"
+            chrome_candidates = [
+                env_chrome,
+                "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            ]
+            driver_candidates = [
+                env_chromedriver,
+                "C:\\chromedriver.exe",
+            ]
         else:
-            chrome_path = "/usr/bin/google-chrome"
-            chromedriver_path = "/usr/bin/chromedriver"
-        
+            chrome_candidates = [env_chrome, "/usr/bin/google-chrome", "google-chrome"]
+            driver_candidates = [env_chromedriver, "/usr/bin/chromedriver", "chromedriver"]
+
+        chrome_path = first_existing(chrome_candidates) or chrome_candidates[0]
+        chromedriver_path = first_existing(driver_candidates) or driver_candidates[0]
+
         log.info(f"🔍 检测到平台: {system}")
-        log.info(f"🔍 Chrome路径: {chrome_path}")
-        log.info(f"🔍 ChromeDriver路径: {chromedriver_path}")
-        
-        return chrome_path, chromedriver_path
+        log.info(f"🔍 Chrome路径候选: {chrome_path}")
+        log.info(f"🔍 ChromeDriver路径候选: {chromedriver_path}")
+
+        return chrome_path or "", chromedriver_path or ""
         
         # 检测运行环境
         self.is_jenkins = self._detect_jenkins_environment()
@@ -108,7 +162,7 @@ class LocalChromeManager:
             chrome_options.add_argument('--disable-plugins')
             
             # 设置Chrome二进制文件路径（仅在路径存在时设置）
-            if os.path.exists(self.chrome_path):
+            if self.chrome_path and os.path.exists(self.chrome_path):
                 chrome_options.binary_location = self.chrome_path
                 log.info(f"✅ 使用本地Chrome: {self.chrome_path}")
             else:
@@ -116,13 +170,13 @@ class LocalChromeManager:
                 log.info("🔄 将使用系统默认Chrome路径")
             
             # 创建Chrome服务 - 支持自动下载ChromeDriver
-            if os.path.exists(self.chromedriver_path):
+            if self.chromedriver_path and os.path.exists(self.chromedriver_path):
                 service = Service(executable_path=self.chromedriver_path)
                 log.info(f"✅ 使用本地ChromeDriver: {self.chromedriver_path}")
             else:
                 log.warning(f"⚠️ 本地ChromeDriver路径不存在: {self.chromedriver_path}")
-                log.info("🔄 将使用Selenium Manager自动下载ChromeDriver")
-                service = Service()  # 不指定路径，让Selenium Manager自动处理
+                # 在 aarch64 等平台，Selenium Manager 可能不支持。仅当找不到时再让它尝试。
+                service = Service()  # 不指定路径，让Selenium Manager自动处理（若可用）
             
             # 创建驱动
             driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -172,7 +226,7 @@ class LocalChromeManager:
             # chrome_options.add_argument('--disable-css')  # 如果不需要样式可以禁用
             
             # 设置Chrome二进制文件路径（仅在路径存在时设置）
-            if os.path.exists(self.chrome_path):
+            if self.chrome_path and os.path.exists(self.chrome_path):
                 chrome_options.binary_location = self.chrome_path
                 log.info(f"✅ 使用本地Chrome: {self.chrome_path}")
             else:
@@ -180,13 +234,13 @@ class LocalChromeManager:
                 log.info("🔄 将使用系统默认Chrome路径")
             
             # 创建Chrome服务 - 支持自动下载ChromeDriver
-            if os.path.exists(self.chromedriver_path):
+            if self.chromedriver_path and os.path.exists(self.chromedriver_path):
                 service = Service(executable_path=self.chromedriver_path)
                 log.info(f"✅ 使用本地ChromeDriver: {self.chromedriver_path}")
             else:
                 log.warning(f"⚠️ 本地ChromeDriver路径不存在: {self.chromedriver_path}")
-                log.info("🔄 将使用Selenium Manager自动下载ChromeDriver")
-                service = Service()  # 不指定路径，让Selenium Manager自动处理
+                # 在 aarch64 等平台，Selenium Manager 可能不支持。仅当找不到时再让它尝试。
+                service = Service()  # 不指定路径，让Selenium Manager自动处理（若可用）
             
             # 创建驱动
             driver = webdriver.Chrome(service=service, options=chrome_options)
